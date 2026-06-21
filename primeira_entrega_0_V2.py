@@ -16,7 +16,7 @@ def iniciar_figura(event):
         figura_nova.desenhar(canvas)
         return
     
-    if figura == "Retângulo":
+    elif figura == "Retângulo":
         figura_nova = Retangulo(x1,y1,x2,y2,cor_linha,cor_fundo)
     elif figura == "Oval":
         figura_nova = Oval(x1,y1,x2,y2,cor_linha,cor_fundo)
@@ -82,7 +82,7 @@ def escolher_Cor_preenchimento():
 
 def deletar():
     global figuras,cor_linha,cor_fundo
-    cor_linha, cor_fundo = None, None
+    cor_linha, cor_fundo = "black",""
     canvas.delete("all")
     figuras = []
 
@@ -100,7 +100,7 @@ janela = Tk();janela.title("Entrega1")
 frame = Frame(janela, relief=GROOVE, bd= 5)
 lbl = Label(frame,text="Escolher Tipo de Desenho");lbl.pack(side=LEFT)
 tipo_figura = StringVar(value="Retângulo")
-menu = OptionMenu(frame,tipo_figura,"Retângulo","Círculo","Oval","Linha", "Rabisco", "Polígono");menu.pack(side=RIGHT)
+menu = ttk.OptionMenu(frame,tipo_figura,"Retângulo","Círculo","Oval","Linha", "Rabisco", "Polígono");menu.pack(side=RIGHT)
 frame.pack(fill=X)
 
 #Criação do Espaço Canvas
@@ -108,7 +108,7 @@ canvas = Canvas(janela, width= 600, height= 600,bg ="white" )
 canvas.pack(pady=10, padx= 10,fill=BOTH)
 
 #Botao de Apagar
-apagar = Button(frame, text="Resetar", command=deletar)
+apagar = Button(frame, text="Resetar", command=deletar,relief=FLAT)
 apagar.pack(side=TOP)
 
 #Interface de cores

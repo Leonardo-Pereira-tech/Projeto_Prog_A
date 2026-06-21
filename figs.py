@@ -111,4 +111,4 @@ class Poligono(Figuras):
         if self.finalizado and len(self.pontos) >= 3:
             canvas.create_polygon(coordenadas, fill=self.corFundo, outline=self.corLinha)
         else:
-            canvas.create_polygon(coordenadas, fill=self.corLinha if self.corLinha else "Black")
+            canvas.create_polygon(coordenadas, fill=self.corLinha if self.corLinha else "black")
