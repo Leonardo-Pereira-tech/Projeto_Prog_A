@@ -73,16 +73,21 @@ janela = Tk();janela.title("Entrega1")
 frame = ttk.Frame(janela)
 lbl = ttk.Label(frame,text="Escolher Tipo de Desenho");lbl.pack(side=LEFT)
 tipo_figura = StringVar(value="Retângulo")
-menu = ttk.OptionMenu(frame,tipo_figura,"Retângulo","Retângulo","Círculo","Oval","Linha", "Rabisco");menu.pack(side=RIGHT,padx=5)
+menu = ttk.Combobox(frame,textvariable=tipo_figura,values=["Retângulo","Círculo","Oval","Linha", "Rabisco"]);menu.pack(side=RIGHT,padx=5) #  <---- Utilização do Combobox(ttk)
+menu.configure(state="readonly") # <--- Uso obrigatório para não alterar texto no novo layout
 frame.pack(fill=X)
 
-#Criação do menu de Cores e Ferramentas
-ttk.Label(frame,text="  ||   ").pack(side=LEFT,padx=5)
+#Separador do Texto do Canvas
+separador = ttk.Separator(frame,orient="vertical")
+separador.pack(side=LEFT, fill=Y,padx=10)
+
+#Botões de Cores e bordas
 coresBorda = ttk.Button(frame,text="Escolher Borda",command=escolher_Cor_borda)
 coresBorda.pack(side=LEFT,padx=5)
 coresPreencher = ttk.Button(frame,text="Preencher figura",command=escolher_Cor_preenchimento)
 coresPreencher.pack(side=LEFT,padx=5)
 
+#Botão Apagar com alterações do TTK
 estiloBotao = ttk.Style()
 estiloBotao.configure("botãoApagar.TButton",foreground="Red",background="red")
 apagar = ttk.Button(frame, text="Resetar", command=deletar, style="botãoApagar.TButton")
