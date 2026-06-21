@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk 
 from tkinter import colorchooser
-from figs import *
+from fig import *
 
 #Aqui a função define a classe(tipo da figura)
 def iniciar_figura(event):
@@ -97,25 +97,32 @@ figura_nova = None
 janela = Tk();janela.title("Entrega1")
 
 #Criação do menu superior
-frame = Frame(janela, relief=GROOVE, bd= 5)
-lbl = Label(frame,text="Escolher Tipo de Desenho");lbl.pack(side=LEFT)
+frame = ttk.Frame(janela)
+lbl = ttk.Label(frame,text="Escolher Tipo de Desenho");lbl.pack(side=LEFT)
 tipo_figura = StringVar(value="Retângulo")
-menu = ttk.OptionMenu(frame,tipo_figura,"Retângulo","Círculo","Oval","Linha", "Rabisco", "Polígono");menu.pack(side=RIGHT)
+menu = ttk.Combobox(frame,textvariable=tipo_figura,values=["Retângulo","Círculo","Oval","Linha", "Rabisco","Polígono"]);menu.pack(side=RIGHT,padx=5) #  <---- Utilização do Combobox(ttk)
+menu.configure(state="readonly") # <--- Uso obrigatório para não alterar texto no novo layout
 frame.pack(fill=X)
+
+#Separador do Texto do Canvas
+separador = ttk.Separator(frame,orient="vertical")
+separador.pack(side=LEFT, fill=Y,padx=10)
+
+#Botões de Cores e bordas
+coresBorda = ttk.Button(frame,text="Escolher Borda",command=escolher_Cor_borda)
+coresBorda.pack(side=LEFT,padx=5)
+coresPreencher = ttk.Button(frame,text="Preencher figura",command=escolher_Cor_preenchimento)
+coresPreencher.pack(side=LEFT,padx=5)
+
+#Botão Apagar com alterações do TTK
+estiloBotao = ttk.Style()
+estiloBotao.configure("botãoApagar.TButton",foreground="Red",background="red")
+apagar = ttk.Button(frame, text="Resetar", command=deletar, style="botãoApagar.TButton")
+apagar.pack(side=RIGHT,padx=20)
 
 #Criação do Espaço Canvas
 canvas = Canvas(janela, width= 600, height= 600,bg ="white" )
 canvas.pack(pady=10, padx= 10,fill=BOTH)
-
-#Botao de Apagar
-apagar = Button(frame, text="Resetar", command=deletar,relief=FLAT)
-apagar.pack(side=TOP)
-
-#Interface de cores
-coresBorda = Button(frame,text="Escolher Borda",command=escolher_Cor_borda)
-coresBorda.pack()
-coresPreencher = Button(frame,text="Preencher figura",command=escolher_Cor_preenchimento)
-coresPreencher.pack()
 
 canvas.bind("<ButtonPress-1>", iniciar_figura)
 canvas.bind("<B1-Motion>", atualizar_figura)
