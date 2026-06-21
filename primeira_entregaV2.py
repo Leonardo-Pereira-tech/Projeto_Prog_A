@@ -70,25 +70,27 @@ figura_nova = None
 janela = Tk();janela.title("Entrega1")
 
 #Criação do menu superior
-frame = Frame(janela, relief=GROOVE, bd= 5)
-lbl = Label(frame,text="Escolher Tipo de Desenho");lbl.pack(side=LEFT)
+frame = ttk.Frame(janela)
+lbl = ttk.Label(frame,text="Escolher Tipo de Desenho");lbl.pack(side=LEFT)
 tipo_figura = StringVar(value="Retângulo")
-menu = OptionMenu(frame,tipo_figura,"Retângulo","Círculo","Oval","Linha", "Rabisco");menu.pack(side=RIGHT)
+menu = ttk.OptionMenu(frame,tipo_figura,"Retângulo","Retângulo","Círculo","Oval","Linha", "Rabisco");menu.pack(side=RIGHT,padx=5)
 frame.pack(fill=X)
+
+#Criação do menu de Cores e Ferramentas
+ttk.Label(frame,text="  ||   ").pack(side=LEFT,padx=5)
+coresBorda = ttk.Button(frame,text="Escolher Borda",command=escolher_Cor_borda)
+coresBorda.pack(side=LEFT,padx=5)
+coresPreencher = ttk.Button(frame,text="Preencher figura",command=escolher_Cor_preenchimento)
+coresPreencher.pack(side=LEFT,padx=5)
+
+estiloBotao = ttk.Style()
+estiloBotao.configure("botãoApagar.TButton",foreground="Red",background="red")
+apagar = ttk.Button(frame, text="Resetar", command=deletar, style="botãoApagar.TButton")
+apagar.pack(side=RIGHT,padx=20)
 
 #Criação do Espaço Canvas
 canvas = Canvas(janela, width= 600, height= 600,bg ="white" )
 canvas.pack(pady=10, padx= 10,fill=BOTH)
-
-#Botao de Apagar
-apagar = Button(frame, text="Resetar", command=deletar)
-apagar.pack(side=TOP)
-
-#Interface de cores
-coresBorda = Button(frame,text="Escolher Borda",command=escolher_Cor_borda)
-coresBorda.pack()
-coresPreencher = Button(frame,text="Preencher figura",command=escolher_Cor_preenchimento)
-coresPreencher.pack()
 
 canvas.bind("<ButtonPress-1>", iniciar_figura)
 canvas.bind("<B1-Motion>", atualizar_figura)
