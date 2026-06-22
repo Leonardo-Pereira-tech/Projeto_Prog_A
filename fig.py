@@ -82,4 +82,33 @@ class Rabisco(Figuras):
             x2,y2 = self.pontos[i + 1]
             
             canvas.create_line(x1,y1,x2,y2, fill=self.corLinha)
-        
+
+class Poligono(Figuras):
+    def __init__(self,x,y,corLinha,corFundo):
+        super().__init__(corLinha, corFundo)
+        self.pontos = [(x, y), (x,y)] # 1 ponto fixo e outro ponto temporario
+        self.finalizado = False
+    
+    def atualizar(self,x,y):
+        if not self.finalizado:
+            self.pontos[-1] = (x,y)
+    
+    def adicionar_ponto(self,x,y):
+        if not self.finalizado:
+            self.pontos.append((x,y))
+    
+    def finalizar(self):
+        self.finalizado = True
+        if len(self.pontos) > 1:
+            self.pontos.pop()
+
+    def desenhar(self, canvas):
+        if len(self.pontos) < 2:
+            return
+        coordenadas = []
+        for x,y in self.pontos:
+            coordenadas.extend([x,y])
+        if self.finalizado and len(self.pontos) >= 3:
+            canvas.create_polygon(coordenadas, fill=self.corFundo, outline=self.corLinha)
+        else:
+            canvas.create_polygon(coordenadas, fill=self.corLinha if self.corLinha else "black")
