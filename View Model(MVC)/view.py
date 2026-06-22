@@ -68,7 +68,7 @@ class canvasView:
     
     def terminarDesenho(self,comandoController):
         if comandoController:
-            self.canvas.bind("<Motion>", comandoController)
+            self.canvas.bind("<ButtonRelease-1>", comandoController)
 
     def terminarPoligono(self,comandoController):
         if comandoController:
