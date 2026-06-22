@@ -1,7 +1,8 @@
 from tkinter import *
 from tkinter import ttk 
 from tkinter import colorchooser
-from fig import *
+from Model.fig import *
+from Model.desenho import *
 
 #Aqui a função define a classe(tipo da figura)
 def iniciar_figura(event):
@@ -28,7 +29,7 @@ def iniciar_figura(event):
         figura_nova = Circulo(x1,y1,x2,y2,cor_linha,cor_fundo)
     elif figura == "Polígono":
         figura_nova = Poligono(x1, y1, cor_linha, cor_fundo)
-        figuras.append(figura_nova)
+        
         
 #Aqui é atualizado o segundo ponto,enquanto desenha a figura atual e armazenadas
 def atualizar_figura(event):
@@ -48,7 +49,7 @@ def terminar_figura(event):
     global figuras, figura_nova
 
     if tipo_figura.get() != "Polígono":
-        figuras.append(figura_nova)
+        figuras.adicionar_figura(figura_nova)
         figura_nova = None
 
 #Função para finalizar o polígono
@@ -56,14 +57,16 @@ def finalizar_poligono(event):
     global figura_nova
     if tipo_figura.get() == "Polígono" and isinstance(figura_nova, Poligono):
         figura_nova.finalizar()
+        figuras.adicionar_figura(figura_nova)
         desenhar()
+        
         figura_nova = None
     
 #Aqui são desenhadas as figuras armazenadas 
 def desenhar():
     global figuras
     canvas.delete("all")
-    for figura in figuras:
+    for figura in figuras.obter_figuras():
         figura.desenhar(canvas)
     
 cor_linha = "black"
@@ -84,14 +87,16 @@ def deletar():
     global figuras,cor_linha,cor_fundo
     cor_linha, cor_fundo = "black",""
     canvas.delete("all")
-    figuras = []
+    figuras.limpar()
+
+#MAIN
 
 x1 = None
 y1 = None
 x2 = None
 y2 = None
 
-figuras = []
+figuras = Desenho()
 figura_nova = None
 
 janela = Tk();janela.title("Entrega1")
