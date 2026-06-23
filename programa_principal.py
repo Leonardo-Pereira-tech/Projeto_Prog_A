@@ -3,18 +3,19 @@ from tkinter import ttk
 from tkinter import colorchooser
 from Model.fig import *
 from Model.desenho import *
+from View.view import *
 
 #Aqui a função define a classe(tipo da figura)
 def iniciar_figura(event):
     global x1, y1, x2, y2, figura_nova, cor_linha, cor_fundo, figuras
     x1,y1,x2,y2 = event.x,event.y,event.x,event.y
-    figura = tipo_figura.get()
+    figura = menu.detectarFigura()
 
     # Caso especial se for um polígono sendo desenhado
     if figura == "Polígono" and isinstance(figura_nova, Poligono) and not figura_nova.finalizado:
         figura_nova.adicionar_ponto(event.x, event.y)
-        desenhar()
-        figura_nova.desenhar(canvas)
+        menu.redesenhar(figuras,figura_nova)
+        figura_nova.desenhar(menu.canvas)
         return
     
     elif figura == "Retângulo":
@@ -36,38 +37,31 @@ def atualizar_figura(event):
     global figura_nova
     
     # Esse event.state é para o acaso do mouse estiver se movendo solto (0)
-    if event.state == 0 and tipo_figura.get() != "Polígono":
+    if event.state == 0 and menu.detectarFigura() != "Polígono":
         return
     
     if figura_nova:
         figura_nova.atualizar(event.x, event.y)
-        desenhar()
-        figura_nova.desenhar(canvas)
+        menu.redesenhar(figuras,figura_nova)
+        figura_nova.desenhar(menu.canvas)
     
 #Aqui é armazenada a figura atual
 def terminar_figura(event):
     global figuras, figura_nova
 
-    if tipo_figura.get() != "Polígono":
+    if menu.detectarFigura() != "Polígono":
         figuras.adicionar_figura(figura_nova)
         figura_nova = None
 
 #Função para finalizar o polígono
 def finalizar_poligono(event):
     global figura_nova
-    if tipo_figura.get() == "Polígono" and isinstance(figura_nova, Poligono):
+    if menu.detectarFigura() == "Polígono" and isinstance(figura_nova, Poligono):
         figura_nova.finalizar()
         figuras.adicionar_figura(figura_nova)
-        desenhar()
-        
+        menu.redesenhar(figuras,figura_nova)
         figura_nova = None
     
-#Aqui são desenhadas as figuras armazenadas 
-def desenhar():
-    global figuras
-    canvas.delete("all")
-    for figura in figuras.obter_figuras():
-        figura.desenhar(canvas)
     
 cor_linha = "black"
 def escolher_Cor_borda(): 
@@ -82,11 +76,10 @@ def escolher_Cor_preenchimento():
     cor = colorchooser.askcolor(title="Selecionar Cor para preencher")
     if cor and cor[1]:
         cor_fundo = cor[1]
-
 def deletar():
     global figuras,cor_linha,cor_fundo
     cor_linha, cor_fundo = "black",""
-    canvas.delete("all")
+    menu.canvas.delete("all")
     figuras.limpar()
 
 #MAIN
@@ -101,38 +94,16 @@ figura_nova = None
 
 janela = Tk();janela.title("Entrega1")
 
-#Criação do menu superior
-frame = ttk.Frame(janela)
-lbl = ttk.Label(frame,text="Escolher Tipo de Desenho");lbl.pack(side=LEFT)
-tipo_figura = StringVar(value="Retângulo")
-menu = ttk.Combobox(frame,textvariable=tipo_figura,values=["Retângulo","Círculo","Oval","Linha", "Rabisco","Polígono"]);menu.pack(side=RIGHT,padx=5) #  <---- Utilização do Combobox(ttk)
-menu.configure(state="readonly") # <--- Uso obrigatório para não alterar texto no novo layout
-frame.pack(fill=X)
+menu = canvasView(janela)
 
-#Separador do Texto do Canvas
-separador = ttk.Separator(frame,orient="vertical")
-separador.pack(side=LEFT, fill=Y,padx=10)
+menu.corBorda(escolher_Cor_borda)
+menu.corPreenchimento(escolher_Cor_preenchimento)
+menu.apagarDesenho(deletar)
 
-#Botões de Cores e bordas
-coresBorda = ttk.Button(frame,text="Escolher Borda",command=escolher_Cor_borda)
-coresBorda.pack(side=LEFT,padx=5)
-coresPreencher = ttk.Button(frame,text="Preencher figura",command=escolher_Cor_preenchimento)
-coresPreencher.pack(side=LEFT,padx=5)
-
-#Botão Apagar com alterações do TTK
-estiloBotao = ttk.Style()
-estiloBotao.configure("botãoApagar.TButton",foreground="Red",background="red")
-apagar = ttk.Button(frame, text="Resetar", command=deletar, style="botãoApagar.TButton")
-apagar.pack(side=RIGHT,padx=20)
-
-#Criação do Espaço Canvas
-canvas = Canvas(janela, width= 600, height= 600,bg ="white" )
-canvas.pack(pady=10, padx= 10,fill=BOTH)
-
-canvas.bind("<ButtonPress-1>", iniciar_figura)
-canvas.bind("<B1-Motion>", atualizar_figura)
-canvas.bind("<ButtonRelease-1>", terminar_figura)
-canvas.bind("<Motion>", atualizar_figura) # A linha do polígono segue o mouse
-canvas.bind("<ButtonPress-3>", finalizar_poligono) # Finaliza o polígono com o botão direito
+menu.inicioDesenho(iniciar_figura)
+menu.atualizarDesenho(atualizar_figura)
+menu.terminarDesenho(terminar_figura)
+menu.atualizarDesenhoPolígono(atualizar_figura)
+menu.terminarPoligono(finalizar_poligono) # Finaliza o polígono com o botão direito
 
 janela.mainloop()
