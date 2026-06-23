@@ -8,6 +8,7 @@ from tkinter import *
 from tkinter import ttk 
 from tkinter import colorchooser
 from Model.fig import *;from Model.desenho import *
+from Controller.controller import *
 
 
 class canvasView:
@@ -25,7 +26,7 @@ class canvasView:
         self.separador = ttk.Separator(self.frame,orient="vertical")
         self.separador.pack(side=LEFT, fill=Y,padx=10)
 
-        self.coresBorda = ttk.Button(self.frame,text="Escolher Borda",command=None)
+        self.coresBorda = ttk.Button(self.frame,text="Escolher Borda",command=None)#substituir comando quando controller tiver pronto
         self.coresBorda.pack(side=LEFT,padx=5)
         self.coresPreencher = ttk.Button(self.frame,text="Preencher figura",command=None)
         self.coresPreencher.pack(side=LEFT,padx=5)
@@ -39,7 +40,7 @@ class canvasView:
         self.canvas.pack(pady=10, padx= 10,fill=BOTH)
         
     def redesenhar(self,listaFiguras,figuraAtual):
-        
+        #interge com model, mas nao tem problema
         self.canvas.delete("all")
         for figura in listaFiguras.obter_figuras():
             figura.desenhar(self.canvas)
@@ -80,4 +81,7 @@ class canvasView:
     def terminarPoligono(self,comandoController):
         if comandoController:
             self.canvas.bind("<ButtonPress-3>", comandoController)
-            
+    def obterCanvas(self):
+        return self.canvas
+    def obterJanela(self):
+        return self.janela
