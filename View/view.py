@@ -5,13 +5,12 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from tkinter import *
-from tkinter import ttk 
-from tkinter import colorchooser
+from tkinter import ttk
 from Model.fig import *;from Model.desenho import *
 from Controller.controller import *
 
 
-class canvasView:
+class Canvasview:
     def __init__(self,janela):
         self.janela = janela
         self.janela.title("Entrega_Principal")
@@ -49,38 +48,7 @@ class canvasView:
     
     def detectarFigura(self):
         return self.tipo_figura.get()
-    
-    def corBorda(self,comandoController):
-        if comandoController:
-            self.coresBorda.configure(command=comandoController)
 
-    def corPreenchimento(self,comandoController):
-        if comandoController:
-            self.coresPreencher.configure(command=comandoController)
-    
-    def apagarDesenho(self,comandoController):
-        if comandoController:
-            self.apagar.configure(command=comandoController)
-    
-    def inicioDesenho(self,comandoController):
-        if comandoController:
-            self.canvas.bind("<ButtonPress-1>", comandoController)   
-    
-    def atualizarDesenho(self,comandoController):
-        if comandoController:
-            self.canvas.bind("<B1-Motion>", comandoController)  
-    
-    def atualizarDesenhoPolígono(self,comandoController):
-        if comandoController:
-            self.canvas.bind("<Motion>", comandoController)
-    
-    def terminarDesenho(self,comandoController):
-        if comandoController:
-            self.canvas.bind("<ButtonRelease-1>", comandoController)
-
-    def terminarPoligono(self,comandoController):
-        if comandoController:
-            self.canvas.bind("<ButtonPress-3>", comandoController)
     def obterCanvas(self):
         return self.canvas
     def obterJanela(self):

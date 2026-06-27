@@ -1,6 +1,6 @@
 import sys
 import os
-
+from tkinter import colorchooser
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Model.fig import *;from Model.desenho import *
@@ -17,14 +17,20 @@ class Controlador():
 
         self.figura_nova = None
         
-        self.view.inicioDesenho(self.iniciar_figura)
-        self.view.atualizarDesenho(self.atualizar_figura)
-        self.view.atualizarDesenhoPolígono(self.atualizar_figura)
-        self.view.terminarDesenho(self.terminar_figura)
-        self.view.terminarPoligono(self.finalizar_poligono)
-        self.view.corBorda(self.escolher_Cor_borda)
-        self.view.corPreenchimento(self.escolher_Cor_preenchimento)
-        self.view.apagarDesenho(self.deletar)
+        canvas = self.view.canvas
+        botaoBorda = self.view.coresBorda
+        botaoPreencher = self.view.coresPreencher
+        botaoApagar = self.view.apagar
+
+        canvas.bind("<ButtonPress-1>", self.iniciar_figura)
+        canvas.bind("<B1-Motion>", self.atualizar_figura)
+        canvas.bind("<Motion>", self.atualizar_figura)  
+        canvas.bind("<ButtonRelease-1>", self.terminar_figura)
+        canvas.bind("<ButtonPress-3>", self.finalizar_poligono)
+        
+        botaoBorda.configure(command=self.escolher_Cor_borda)
+        botaoPreencher.configure(command=self.escolher_Cor_preenchimento)
+        botaoApagar.configure(command=self.deletar)
         
     def iniciar_figura(self,event):
         x1 ,y1 = event.x, event.y

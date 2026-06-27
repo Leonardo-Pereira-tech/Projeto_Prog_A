@@ -1,6 +1,4 @@
 from tkinter import *
-from tkinter import ttk 
-from tkinter import colorchooser
 from Model.fig import *
 from Model.desenho import *
 from View.view import *
@@ -15,7 +13,7 @@ figura_nova = None
 
 janela = Tk();janela.title("Entrega1")
 
-menu = canvasView(janela)
+menu = Canvasview(janela)
 
 controlador = Controlador(figuras,menu)
 
