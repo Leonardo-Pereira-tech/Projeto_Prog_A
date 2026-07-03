@@ -30,7 +30,7 @@ class FerramentaRetangulo(FerramentaState):
         self.controlador = controlador
         if self.controlador.figura_nova:
             self.controlador.figura_nova.atualizar(event.x,event.y)
-            self.controlador.figura_nova.redesenhar(self.controlador.view.canvas)
+            self.controlador.figura_nova.redesenhar(self.controlador.view.canvas,self.controlador.figura_nova)
             
     def soltar(self,controlador,event):
         self.controlador = controlador
@@ -50,7 +50,7 @@ class FerramentaLinha(FerramentaState):
         
         if self.controlador.figura_nova:
             self.controlador.figura_nova.atualizar(event.x,event.y)
-            self.controlador.figura_nova.redesenhar(self.controlador.view.canvas)
+            self.controlador.figura_nova.redesenhar(self.controlador.view.canvas,self.controlador.figura_nova)
             
     def soltar(self,controlador,event):
         self.controlador = controlador
