@@ -48,12 +48,10 @@ class FerramentaLinha(FerramentaState):
     def arrastar(self,controlador,event):
         self.controlador = controlador
         
-        if self.controlador.figura_nova:
-            self.controlador.figura_nova.atualizar(event.x,event.y)
-            self.controlador.figura_nova.redesenhar(self.controlador.view.canvas)
+        self.controlador.figura_nova.atualizar(event.x,event.y)
+        self.controlador.figura_nova.redesenhar(self.controlador.view.canvas)
             
     def soltar(self,controlador,event):
         self.controlador = controlador
-        if controlador.figura_nova:
-            self.controlador.desenho.adicionar_figura(self.controlador.figura_nova)
-            self.controlador.figura_nova = None
+        self.controlador.desenho.adicionar_figura(self.controlador.figura_nova)
+        self.controlador.figura_nova = None
