@@ -1,8 +1,8 @@
-from tkinter import *
-from Model.fig import *
-from Model.desenho import *
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from Model.fig import *;from Model.desenho import *
 from View.view import *
-from Controller.controller import *
 from abc import ABC, abstractmethod
 
 class FerramentaState(ABC):
