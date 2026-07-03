@@ -25,30 +25,30 @@ class Controlador():
         botaoPreencher = self.view.coresPreencher
         botaoApagar = self.view.apagar
 
-        canvas.bind("<ButtonPress-1>", self.iniciar_figura)
-        canvas.bind("<B1-Motion>", self.atualizar_figura)
-        canvas.bind("<Motion>", self.atualizar_figura)  
-        canvas.bind("<ButtonRelease-1>", self.terminar_figura)
-        canvas.bind("<ButtonPress-3>", self.finalizar_poligono)
+        canvas.bind("<ButtonPress-1>", self.clickMouse)
+        canvas.bind("<B1-Motion>", self.arrastarMouse)
+        canvas.bind("<Motion>", self.arrastarMouse)  
+        canvas.bind("<ButtonRelease-1>", self.soltarMouse)
+        canvas.bind("<ButtonPress-3>", self.botaoDireitoMouse)
         
         botaoBorda.configure(command=self.escolher_Cor_borda)
         botaoPreencher.configure(command=self.escolher_Cor_preenchimento)
         botaoApagar.configure(command=self.deletar)
         
-        self.menu.bind("<<ComboboxSelected>>", self.mudarFerramenta)
+        self.view.menu.bind("<<ComboboxSelected>>", self.mudarFerramenta)
         
-    def iniciar_figura(self,event):
+    def clickMouse(self,event):
         self.ferramenta.click(self,event)
     
-    def atualizar_figura(self,event):
+    def arrastarMouse(self,event):
         self.ferramenta.arrastar(self,event)
     
     #Aqui é armazenada a figura atual
-    def terminar_figura(self, event):
+    def soltarMouse(self, event):
         self.ferramenta.soltar(self, event)
     
     #Função para finalizar o polígono
-    def finalizar_poligono(self, event):
+    def botaoDireitoMouse(self, event):
         self.ferramenta.botaoDireito(self, event) 
     
     def escolher_Cor_borda(self): 
@@ -67,7 +67,7 @@ class Controlador():
         self.view.canvas.delete("all")
         self.desenho.limpar()
     
-    def mudarFerramenta(self,event = None):
+    def mudarFerramenta(self,nome , event = None):
         nome = self.view.detectarFigura()
         if nome == "Retângulo":
             self.ferramenta = FerramentaRetangulo()
