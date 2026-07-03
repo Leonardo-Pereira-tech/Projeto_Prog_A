@@ -5,6 +5,7 @@ from tkinter import colorchooser
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from Model.fig import *;from Model.desenho import *
 from View.view import *
+from Controller.FerramentaState import *
 
 class Controlador():
     
@@ -16,6 +17,8 @@ class Controlador():
         self.cor_fundo = ""
 
         self.figura_nova = None
+        
+        self.ferramenta = FerramentaRetangulo()
         
         canvas = self.view.canvas
         botaoBorda = self.view.coresBorda
@@ -32,55 +35,21 @@ class Controlador():
         botaoPreencher.configure(command=self.escolher_Cor_preenchimento)
         botaoApagar.configure(command=self.deletar)
         
-    def iniciar_figura(self,event):
-        x1 ,y1 = event.x, event.y
-        figura = self.view.detectarFigura()
-
-        # Caso especial se for um polígono sendo desenhado
-        if figura == "Polígono" and isinstance(self.figura_nova, Poligono) and not self.figura_nova.finalizado:
-            self.figura_nova.adicionar_ponto(event.x, event.y)
-            self.view.redesenhar(self.desenho,self.figura_nova)
-            self.figura_nova.desenhar(self.view.canvas)
-            return
+        self.menu.bind("<<ComboboxSelected>>", self.mudarFerramenta)
         
-        elif figura == "Retângulo":
-            self.figura_nova = Retangulo(x1,y1,x1,y1,self.cor_linha,self.cor_fundo)
-        elif figura == "Oval":
-            self.figura_nova = Oval(x1,y1,x1,y1,self.cor_linha,self.cor_fundo)
-        elif figura == "Linha":
-            self.figura_nova = Linha(x1,y1,x1,y1,self.cor_linha)
-        elif figura == "Rabisco":
-            self.figura_nova = Rabisco(x1,y1,self.cor_linha)
-        elif figura == "Círculo":
-            self.figura_nova = Circulo(x1,y1,x1,y1,self.cor_linha,self.cor_fundo)
-        elif figura == "Polígono":
-            self.figura_nova = Poligono(x1, y1, self.cor_linha, self.cor_fundo)
+    def iniciar_figura(self,event):
+        self.ferramenta.click(self,event)
     
     def atualizar_figura(self,event):
-        # Esse event.state é para o acaso do mouse estiver se movendo solto (0)
-        if event.state == 0 and self.view.detectarFigura() != "Polígono":
-            return
-        
-        if self.figura_nova:
-            self.figura_nova.atualizar(event.x, event.y)
-            self.view.redesenhar(self.desenho,self.figura_nova)
-            self.figura_nova.desenhar(self.view.canvas)
+        self.ferramenta.arrastar(self,event)
     
     #Aqui é armazenada a figura atual
     def terminar_figura(self, event):
-
-        if self.view.detectarFigura() != "Polígono":
-            self.desenho.adicionar_figura(self.figura_nova)
-            self.figura_nova = None
+        self.ferramenta.soltar(self, event)
     
     #Função para finalizar o polígono
     def finalizar_poligono(self, event):
-        
-        if self.view.detectarFigura() == "Polígono" and isinstance(self.figura_nova, Poligono):
-            self.figura_nova.finalizar()
-            self.desenho.adicionar_figura(self.figura_nova)
-            self.view.redesenhar(self.desenho,self.figura_nova)
-            self.figura_nova = None
+        self.ferramenta.botaoDireito(self, event) 
     
     def escolher_Cor_borda(self): 
         cor = colorchooser.askcolor(title="Selecionar Cor")
@@ -97,4 +66,19 @@ class Controlador():
         self.cor_linha, self.cor_fundo = "black",""
         self.view.canvas.delete("all")
         self.desenho.limpar()
-            
+    
+    def mudarFerramenta(self,event = None):
+        nome = self.view.detectarFigura()
+        if nome == "Retângulo":
+            self.ferramenta = FerramentaRetangulo()
+        elif nome == "Linha":
+            self.ferramenta = FerramentaLinha()
+        elif nome == "Polígono":
+            self.ferramenta = FerramentaPoligono()
+        elif nome == "Rabisco":
+            self.ferramenta = FerramentaRabisco()
+        elif nome == "Oval":
+            self.ferramenta = FerramentaOval()
+        elif nome == "Círculo":
+            self.ferramenta = FerramentaCirculo()
+        
