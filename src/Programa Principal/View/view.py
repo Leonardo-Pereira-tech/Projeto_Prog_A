@@ -35,6 +35,15 @@ class Canvasview:
         self.apagar = ttk.Button(self.frame, text="Resetar", command=None, style="botãoApagar.TButton")
         self.apagar.pack(side=RIGHT,padx=20)
 
+        self.salvar = ttk.Button(self.frame,text="Salve seu Projeto",command=None)
+        self.salvar.pack(side=LEFT,padx=10)
+
+        self.abrir = ttk.Button(self.frame,text="Abrir Projeto",command=None)
+        self.abrir.pack(side=LEFT,padx=10)
+
+        self.printar = ttk.Button(self.frame,text="Print",command=None)
+        self.printar.pack(side=LEFT,padx=10)
+
         self.canvas = Canvas(janela, width= 600, height= 600,bg ="white" )
         self.canvas.pack(pady=10, padx= 10,fill=BOTH)
         
