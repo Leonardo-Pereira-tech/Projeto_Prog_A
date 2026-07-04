@@ -14,12 +14,14 @@ class Controlador():
     def __init__(self,desenho,view):
         self.desenho = desenho
         self.view = view
+        
         self.cor_linha = "black"
         self.cor_fundo = ""
+
         self.figura_nova = None
         
-        self.ferramenta_atual = FerramentaLinha()
-    
+        self.ferramenta = FerramentaRetangulo()
+        
         canvas = self.view.canvas
         botaoBorda = self.view.coresBorda
         botaoPreencher = self.view.coresPreencher
@@ -27,11 +29,13 @@ class Controlador():
         botaoPrintar = self.view.printar
         botaoAbrir = self.view.abrir
         botaoSalvarProjeto = self.view.salvar
-        
+
+
         canvas.bind("<ButtonPress-1>", self.clickMouse)
         canvas.bind("<B1-Motion>", self.arrastarMouse)
         canvas.bind("<Motion>", self.arrastarMouse)  
         canvas.bind("<ButtonRelease-1>", self.soltarMouse)
+        canvas.bind("<ButtonPress-3>", self.botaoDireitoMouse)
         
         botaoBorda.configure(command=self.escolher_Cor_borda)
         botaoPreencher.configure(command=self.escolher_Cor_preenchimento)
@@ -39,26 +43,23 @@ class Controlador():
         botaoPrintar.configure(command=self.printar_imagem)
         botaoAbrir.configure(command=self.abrir_imagem)
         botaoSalvarProjeto.configure(command=self.salvar_projeto)
-
+        
         self.view.menu.bind("<<ComboboxSelected>>", self.mudarFerramenta)
-
+        
     def clickMouse(self,event):
-        self.ferramenta_atual.click(self,event)
+        self.ferramenta.click(self,event)
     
     def arrastarMouse(self,event):
-        self.ferramenta_atual.arrastar(self,event)
+        self.ferramenta.arrastar(self,event)
     
-    def soltarMouse(self,event):
-        self.ferramenta_atual.soltar(self,event)
-        
-    def mudarFerramenta(self,nome):
-        if nome == "Linha":
-            self.ferramenta_atual = FerramentaLinha()
-        elif nome == "Retangulo":
-            self.ferramenta_atual = FerramentaRetangulo()
-        # E assim por diante...
-        
-
+    #Aqui é armazenada a figura atual
+    def soltarMouse(self, event):
+        self.ferramenta.soltar(self, event)
+    
+    #Função para finalizar o polígono
+    def botaoDireitoMouse(self, event):
+        self.ferramenta.botaoDireito(self, event) 
+    
     def escolher_Cor_borda(self): 
         cor = colorchooser.askcolor(title="Selecionar Cor")
         if cor and cor[1]:
@@ -74,7 +75,7 @@ class Controlador():
         self.cor_linha, self.cor_fundo = "black",""
         self.view.canvas.delete("all")
         self.desenho.limpar()
-
+    
     def mudarFerramenta(self,nome , event = None):
         nome = self.view.detectarFigura()
         if nome == "Retângulo":
@@ -89,7 +90,7 @@ class Controlador():
             self.ferramenta = FerramentaOval()
         elif nome == "Círculo":
             self.ferramenta = FerramentaCirculo()
-        
+
     def printar_imagem(self):
         caminho_arquivo = filedialog.asksaveasfilename(
             defaultextension="png",
