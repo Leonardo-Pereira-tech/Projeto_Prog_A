@@ -32,21 +32,16 @@ class Controlador():
         canvas.bind("<B1-Motion>", self.arrastarMouse)
         canvas.bind("<Motion>", self.arrastarMouse)  
         canvas.bind("<ButtonRelease-1>", self.soltarMouse)
-        canvas.bind("<ButtonPress-3>", self.finalizar_poligono)
         
         botaoBorda.configure(command=self.escolher_Cor_borda)
         botaoPreencher.configure(command=self.escolher_Cor_preenchimento)
         botaoApagar.configure(command=self.deletar)
-<<<<<<< Updated upstream
-    
-=======
         botaoPrintar.configure(command=self.printar_imagem)
         botaoAbrir.configure(command=self.abrir_imagem)
         botaoSalvarProjeto.configure(command=self.salvar_projeto)
 
         self.view.menu.bind("<<ComboboxSelected>>", self.mudarFerramenta)
-        
->>>>>>> Stashed changes
+
     def clickMouse(self,event):
         self.ferramenta_atual.click(self,event)
     
@@ -79,10 +74,7 @@ class Controlador():
         self.cor_linha, self.cor_fundo = "black",""
         self.view.canvas.delete("all")
         self.desenho.limpar()
-<<<<<<< Updated upstream
-            
-=======
-    
+
     def mudarFerramenta(self,nome , event = None):
         nome = self.view.detectarFigura()
         if nome == "Retângulo":
@@ -132,4 +124,3 @@ class Controlador():
         if caminho_arquivo:
             with open(caminho_arquivo,'wb') as arquivo:
                 pickle.dump(self.desenho.figuras, arquivo)
->>>>>>> Stashed changes
