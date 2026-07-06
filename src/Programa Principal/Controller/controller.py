@@ -1,11 +1,14 @@
 import sys
 import os
-from tkinter import colorchooser
+from tkinter import colorchooser,filedialog
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from Model.fig import *;from Model.desenho import *
 from View.view import *
-
+from Controller.FerramentaState import *
+from PIL import ImageGrab
+import pickle
 class Controlador():
     
     def __init__(self,desenho,view):
@@ -17,70 +20,44 @@ class Controlador():
 
         self.figura_nova = None
         
+        self.ferramenta = FerramentaRetangulo()
+        
         canvas = self.view.canvas
         botaoBorda = self.view.coresBorda
         botaoPreencher = self.view.coresPreencher
         botaoApagar = self.view.apagar
+        botaoPrintar = self.view.printar
+        botaoAbrir = self.view.abrir
+        botaoSalvarProjeto = self.view.salvar
 
-        canvas.bind("<ButtonPress-1>", self.iniciar_figura)
-        canvas.bind("<B1-Motion>", self.atualizar_figura)
-        canvas.bind("<Motion>", self.atualizar_figura)  
-        canvas.bind("<ButtonRelease-1>", self.terminar_figura)
-        canvas.bind("<ButtonPress-3>", self.finalizar_poligono)
+        canvas.bind("<ButtonPress-1>", self.clickMouse)
+        canvas.bind("<B1-Motion>", self.arrastarMouse)
+        canvas.bind("<Motion>", self.arrastarMouse)  
+        canvas.bind("<ButtonRelease-1>", self.soltarMouse)
+        canvas.bind("<ButtonPress-3>", self.botaoDireitoMouse)
         
         botaoBorda.configure(command=self.escolher_Cor_borda)
         botaoPreencher.configure(command=self.escolher_Cor_preenchimento)
         botaoApagar.configure(command=self.deletar)
+        botaoPrintar.configure(command=self.printar_imagem)
+        botaoAbrir.configure(command=self.abrir_imagem)
+        botaoSalvarProjeto.configure(command=self.salvar_projeto)
         
-    def iniciar_figura(self,event):
-        x1 ,y1 = event.x, event.y
-        figura = self.view.detectarFigura()
-
-        # Caso especial se for um polígono sendo desenhado
-        if figura == "Polígono" and isinstance(self.figura_nova, Poligono) and not self.figura_nova.finalizado:
-            self.figura_nova.adicionar_ponto(event.x, event.y)
-            self.view.redesenhar(self.desenho,self.figura_nova)
-            self.figura_nova.desenhar(self.view.canvas)
-            return
+        self.view.menu.bind("<<ComboboxSelected>>", self.mudarFerramenta)
         
-        elif figura == "Retângulo":
-            self.figura_nova = Retangulo(x1,y1,x1,y1,self.cor_linha,self.cor_fundo)
-        elif figura == "Oval":
-            self.figura_nova = Oval(x1,y1,x1,y1,self.cor_linha,self.cor_fundo)
-        elif figura == "Linha":
-            self.figura_nova = Linha(x1,y1,x1,y1,self.cor_linha)
-        elif figura == "Rabisco":
-            self.figura_nova = Rabisco(x1,y1,self.cor_linha)
-        elif figura == "Círculo":
-            self.figura_nova = Circulo(x1,y1,x1,y1,self.cor_linha,self.cor_fundo)
-        elif figura == "Polígono":
-            self.figura_nova = Poligono(x1, y1, self.cor_linha, self.cor_fundo)
+    def clickMouse(self,event):
+        self.ferramenta.click(self,event)
     
-    def atualizar_figura(self,event):
-        # Esse event.state é para o acaso do mouse estiver se movendo solto (0)
-        if event.state == 0 and self.view.detectarFigura() != "Polígono":
-            return
-        
-        if self.figura_nova:
-            self.figura_nova.atualizar(event.x, event.y)
-            self.view.redesenhar(self.desenho,self.figura_nova)
-            self.figura_nova.desenhar(self.view.canvas)
+    def arrastarMouse(self,event):
+        self.ferramenta.arrastar(self,event)
     
     #Aqui é armazenada a figura atual
-    def terminar_figura(self, event):
-
-        if self.view.detectarFigura() != "Polígono":
-            self.desenho.adicionar_figura(self.figura_nova)
-            self.figura_nova = None
+    def soltarMouse(self, event):
+        self.ferramenta.soltar(self, event)
     
     #Função para finalizar o polígono
-    def finalizar_poligono(self, event):
-        
-        if self.view.detectarFigura() == "Polígono" and isinstance(self.figura_nova, Poligono):
-            self.figura_nova.finalizar()
-            self.desenho.adicionar_figura(self.figura_nova)
-            self.view.redesenhar(self.desenho,self.figura_nova)
-            self.figura_nova = None
+    def botaoDireitoMouse(self, event):
+        self.ferramenta.botaoDireito(self, event) 
     
     def escolher_Cor_borda(self): 
         cor = colorchooser.askcolor(title="Selecionar Cor")
@@ -97,4 +74,53 @@ class Controlador():
         self.cor_linha, self.cor_fundo = "black",""
         self.view.canvas.delete("all")
         self.desenho.limpar()
+    
+    def mudarFerramenta(self,nome , event = None):
+        nome = self.view.detectarFigura()
+        if nome == "Retângulo":
+            self.ferramenta = FerramentaRetangulo()
+        elif nome == "Linha":
+            self.ferramenta = FerramentaLinha()
+        elif nome == "Polígono":
+            self.ferramenta = FerramentaPoligono()
+        elif nome == "Rabisco":
+            self.ferramenta = FerramentaRabisco()
+        elif nome == "Oval":
+            self.ferramenta = FerramentaOval()
+        elif nome == "Círculo":
+            self.ferramenta = FerramentaCirculo()
+
+    def printar_imagem(self):
+        caminho_arquivo = filedialog.asksaveasfilename(
+            defaultextension="png",
+            filetypes=[("Todos os arquivos", "*.png"),("Todos os arquivos","*.*")])
+        
+        if caminho_arquivo:
+            x1 = self.view.canvas.winfo_rootx()
+            y1 = self.view.canvas.winfo_rooty()
             
+            x2 = self.view.canvas.winfo_width() + x1
+            y2 = self.view.canvas.winfo_height() + y1
+            imagem = ImageGrab.grab(bbox=(x1,y1,x2,y2))
+            imagem.save(caminho_arquivo)
+
+    def abrir_imagem(self):
+        caminho_arquivo = filedialog.askopenfilename(
+            filetypes=[("Arquivos de Desenho","*.desenho"),("Todos os arquivos","*.*")]   
+        )
+        if caminho_arquivo:
+            with open(caminho_arquivo,'rb') as arquivo:
+                lista_figuras_carregadas = pickle.load(arquivo)
+            self.desenho.figuras = lista_figuras_carregadas
+            self.view.canvas.delete("all")
+            for figura in self.desenho.figuras:
+                figura.desenhar(self.view.canvas)
+
+    def salvar_projeto(self):
+        caminho_arquivo = filedialog.asksaveasfilename(
+            defaultextension=".desenho",
+            filetypes=[("Arquivos de Desenho","*.desenho"),("Todos os arquivos","*.*")]
+        )
+        if caminho_arquivo:
+            with open(caminho_arquivo,'wb') as arquivo:
+                pickle.dump(self.desenho.figuras, arquivo)
