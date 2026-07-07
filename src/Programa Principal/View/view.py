@@ -44,6 +44,9 @@ class Canvasview:
         self.printar = ttk.Button(self.frame,text="Print",command=None)
         self.printar.pack(side=LEFT,padx=10)
 
+        self.escala = ttk.Scale(self.frame,from_=1, to=50,orient=HORIZONTAL,command=None)
+        self.escala.pack(side=RIGHT,padx=10)
+
         self.canvas = Canvas(janela, width= 600, height= 600,bg ="white" )
         self.canvas.pack(pady=10, padx= 10,fill=BOTH)
         
