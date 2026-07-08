@@ -19,8 +19,7 @@ class FerramentaState(ABC):
     @abstractmethod
     def soltar(self,controlador,event):
         pass
-    
-    
+        
 class FerramentaRetangulo(FerramentaState):
     
     def click(self,controlador,event):
@@ -121,7 +120,6 @@ class FerramentaOval(FerramentaState):
             controlador.figura_nova = None
             
 class FerramentaSelecionar(FerramentaState):
-
     def click(self, controlador, event):
         if controlador.figura_selecionada:
             controlador.figura_selecionada.selecionada = False
@@ -130,9 +128,23 @@ class FerramentaSelecionar(FerramentaState):
 
         if controlador.figura_selecionada:
             controlador.figura_selecionada.selecionada = True
+            controlador.clickX = event.x
+            controlador.clickY = event.y
+            controlador.view.canvas.focus_set()
+
         controlador.view.redesenhar(controlador.desenho, None)
+
     def arrastar(self, controlador, event):
-        pass
-    
+        if controlador.figura_selecionada and (controlador.clickX != None and controlador.clickY != None): # Sistema não dar erro quando parar de selecionar
+            deltaX = event.x - controlador.clickX # atualizar em tempo real e garantir que não vai deformar a figura
+            deltaY = event.y - controlador.clickY
+            
+            controlador.figura_selecionada.mover(deltaX,deltaY) # Definição no model para mexer
+            controlador.clickX = event.x
+            controlador.clickY = event.y
+
+            controlador.view.redesenhar(controlador.desenho,None) #Atualizar o canvas com a mudança
+            
     def soltar(self, controlador, event):
-        pass
+        controlador.clickX = None # Reset no valor quando parar de soltar (E fazer com que pare de seguir o mouse)
+        controlador.clickY = None 

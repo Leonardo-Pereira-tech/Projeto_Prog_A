@@ -39,6 +39,8 @@ class Controlador():
         canvas.bind("<Motion>", self.arrastarMouse)  
         canvas.bind("<ButtonRelease-1>", self.soltarMouse)
         canvas.bind("<ButtonPress-3>", self.botaoDireitoMouse)
+        canvas.bind("<BackSpace>",self.apagarDesenho)
+        canvas.bind("<Delete>",self.apagarDesenho)       
         
         botaoBorda.configure(command=self.escolher_Cor_borda)
         botaoPreencher.configure(command=self.escolher_Cor_preenchimento)
@@ -134,3 +136,10 @@ class Controlador():
         if caminho_arquivo:
             with open(caminho_arquivo,'wb') as arquivo:
                 pickle.dump(self.desenho.figuras, arquivo)
+    
+    def apagarDesenho(self, event=None):
+        if self.figura_selecionada:
+            self.desenho.figuras.remove(self.figura_selecionada)
+            self.figura_selecionada = None
+
+            self.view.redesenhar(self.desenho,None)

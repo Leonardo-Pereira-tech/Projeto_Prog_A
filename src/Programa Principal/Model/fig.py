@@ -14,9 +14,17 @@ class Figuras(ABC):
     @abstractmethod
     def desenhar(self,canvas):
         pass
+
     @abstractmethod
     def contem(self, x, y):
         pass
+
+    def mover(self,dx,dy): # Padrão para figuras como Linha,Retângulo, Oval e Círculo (Polígono e Rabisco possuem outra forma por serem listas)
+        self.x1 += dx
+        self.y1 += dy
+        self.x2 += dx
+        self.y2 += dy
+
     def estilo(self):
 
         if self.selecionada:
@@ -28,7 +36,7 @@ class Figuras(ABC):
         return {
             "width": self.tamanho #substituir por atributo borda depois
         }
-    
+
 #Pode criar Subclasse que separa as figuras do rabisco,evitando de escrever "atualizar" em todas outras figuras
 class Linha(Figuras):
     def __init__(self,x1,y1,x2,y2,corLinha,tamanho):
@@ -72,10 +80,10 @@ class Oval(Figuras):
     def atualizar(self,x, y):
         self.x2 = x
         self.y2 = y
-    
+
     def desenhar(self, canvas):
         canvas.create_oval(self.x1,self.y1,self.x2, self.y2,fill=self.corFundo, outline=self.corLinha,**self.estilo() )
-    
+
     def contem(self,x, y):
         esquerda = min(self.x1, self.x2)
         direita = max(self.x1,self.x2)
@@ -90,6 +98,7 @@ class Oval(Figuras):
         
         return ((x - cx) ** 2) / (a ** 2) + ((y - cy) ** 2) / (b ** 2) <= 1
         #A equação da Elipse é (x - c1)**2/a**2 + (y - c2)**2/b** = 1
+
 class Circulo(Figuras):
     def __init__(self,x1, y1,x2,y2,corLinha, corFundo,tamanho):
         super().__init__(corLinha, corFundo,tamanho)
@@ -122,6 +131,7 @@ class Rabisco(Figuras):
             x2,y2 = self.pontos[i + 1]
             
             canvas.create_line(x1,y1,x2,y2, fill=self.corLinha,**self.estilo())
+
     def contem(self, x, y):
         for i in range(len(self.pontos)-1):
             x1,y1 = self.pontos[i]
@@ -129,7 +139,9 @@ class Rabisco(Figuras):
             if distancia(x1,x2,y1,y2,x,y) <= 5:
                 return True
         return False
-            
+    
+    def mover(self,dx,dy):
+        self.pontos = [(dx+x , dy+y) for x,y in self.pontos] # Compreensão de listas para atualizar simultaneamente o x e o y
 
 class Poligono(Figuras):
     def __init__(self,x,y,corLinha,corFundo,tamanho):
@@ -160,6 +172,7 @@ class Poligono(Figuras):
             canvas.create_polygon(coordenadas, fill=self.corFundo, outline=self.corLinha,**self.estilo())
         else:
             canvas.create_polygon(coordenadas, fill=self.corLinha if self.corLinha else "black")
+
     def contem(self, x, y) :
         """
         Verifica se o ponto (x, y) está dentro de um polígono.
@@ -193,7 +206,10 @@ class Poligono(Figuras):
             p1x, p1y = p2x, p2y
 
         return dentro
-            
+    
+    def mover(self,dx,dy):
+        self.pontos = [(dx+x , dy+y) for x , y in self.pontos] # Compreensão de listas para atualizar simultaneamente o x e o y
+
 def distancia(x1, x2, y1, y2, px, py) :
     # Vetor direção do segmento (AB)
     dx = x2 - x1

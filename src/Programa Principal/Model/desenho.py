@@ -21,5 +21,3 @@ class Desenho():
         for figura in reversed(self.figuras):
             if figura.contem(x,y):
                 return figura
-            
-    
