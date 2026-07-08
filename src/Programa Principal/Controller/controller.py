@@ -22,6 +22,8 @@ class Controlador():
         
         self.ferramenta = FerramentaRetangulo()
         
+        self.figura_selecionada = None
+        
         canvas = self.view.canvas
         botaoBorda = self.view.coresBorda
         botaoPreencher = self.view.coresPreencher
@@ -89,6 +91,8 @@ class Controlador():
             self.ferramenta = FerramentaOval()
         elif nome == "Círculo":
             self.ferramenta = FerramentaCirculo()
+        elif nome == "Selecionar":
+            self.ferramenta = FerramentaSelecionar()
 
     def printar_imagem(self):
         caminho_arquivo = filedialog.asksaveasfilename(

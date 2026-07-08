@@ -18,7 +18,7 @@ class Canvasview:
         self.frame = ttk.Frame(self.janela)
         self.lbl = ttk.Label(self.frame,text="Escolher Tipo de Desenho");self.lbl.pack(side=LEFT)
         self.tipo_figura = StringVar(value="Retângulo")
-        self.menu = ttk.Combobox(self.frame,textvariable=self.tipo_figura,values=["Retângulo","Círculo","Oval","Linha", "Rabisco","Polígono"]);self.menu.pack(side=RIGHT,padx=5) 
+        self.menu = ttk.Combobox(self.frame,textvariable=self.tipo_figura,values=["Retângulo","Círculo","Oval","Linha", "Rabisco","Polígono","Selecionar"]);self.menu.pack(side=RIGHT,padx=5) 
         self.menu.configure(state="readonly")
         self.frame.pack(fill=X)      
         

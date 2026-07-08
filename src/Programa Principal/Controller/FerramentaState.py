@@ -20,6 +20,7 @@ class FerramentaState(ABC):
     def soltar(self,controlador,event):
         pass
     
+    
 class FerramentaRetangulo(FerramentaState):
     
     def click(self,controlador,event):
@@ -119,4 +120,19 @@ class FerramentaOval(FerramentaState):
             controlador.desenho.adicionar_figura(controlador.figura_nova)
             controlador.figura_nova = None
             
+class FerramentaSelecionar(FerramentaState):
 
+    def click(self, controlador, event):
+        if controlador.figura_selecionada:
+            controlador.figura_selecionada.selecionada = False
+            
+        controlador.figura_selecionada = controlador.desenho.selecionar_figura(event.x,event.y)
+
+        if controlador.figura_selecionada:
+            controlador.figura_selecionada.selecionada = True
+        controlador.view.redesenhar(controlador.desenho, None)
+    def arrastar(self, controlador, event):
+        pass
+    
+    def soltar(self, controlador, event):
+        pass
