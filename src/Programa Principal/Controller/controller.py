@@ -1,14 +1,14 @@
 import sys
 import os
 from tkinter import colorchooser,filedialog
-from PIL import ImageGrab
-import pickle
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from Model.fig import *;from Model.desenho import *
 from View.view import *
 from Controller.FerramentaState import *
-
+from PIL import ImageGrab
+import pickle
 class Controlador():
     
     def __init__(self,desenho,view):
@@ -17,6 +17,7 @@ class Controlador():
         
         self.cor_linha = "black"
         self.cor_fundo = ""
+        self.espessura_linha = 1.0
 
         self.figura_nova = None
         
@@ -29,8 +30,8 @@ class Controlador():
         botaoPrintar = self.view.printar
         botaoAbrir = self.view.abrir
         botaoSalvarProjeto = self.view.salvar
-
-
+        escalaBorda = self.view.escala
+        
         canvas.bind("<ButtonPress-1>", self.clickMouse)
         canvas.bind("<B1-Motion>", self.arrastarMouse)
         canvas.bind("<Motion>", self.arrastarMouse)  
@@ -43,6 +44,7 @@ class Controlador():
         botaoPrintar.configure(command=self.printar_imagem)
         botaoAbrir.configure(command=self.abrir_imagem)
         botaoSalvarProjeto.configure(command=self.salvar_projeto)
+        escalaBorda.configure(command=self.tamanhoBorda)
         
         self.view.menu.bind("<<ComboboxSelected>>", self.mudarFerramenta)
         
@@ -64,7 +66,10 @@ class Controlador():
         cor = colorchooser.askcolor(title="Selecionar Cor")
         if cor and cor[1]:
             self.cor_linha = cor[1]
-            
+    
+    def tamanhoBorda(self,valor):
+        self.espessura_linha = float(valor)
+    
     def escolher_Cor_preenchimento(self): 
         cor = colorchooser.askcolor(title="Selecionar Cor para preencher")
         if cor and cor[1]:

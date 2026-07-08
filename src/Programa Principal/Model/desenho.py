@@ -16,4 +16,3 @@ class Desenho():
 
     def obter_figuras(self):
         return self.figuras
-    
