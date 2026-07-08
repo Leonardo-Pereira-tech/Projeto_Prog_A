@@ -20,8 +20,6 @@ class Desenho():
     def selecionar_figura(self,x, y):
         for figura in reversed(self.figuras):
             if figura.contem(x,y):
-                print("Achei:", figura)
-
                 return figura
             
     

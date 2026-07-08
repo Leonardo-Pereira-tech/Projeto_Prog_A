@@ -25,7 +25,7 @@ class FerramentaRetangulo(FerramentaState):
     
     def click(self,controlador,event):
         x1,y1 = event.x, event.y
-        controlador.figura_nova = Retangulo(x1,y1,x1,y1,controlador.cor_linha,controlador.cor_fundo)
+        controlador.figura_nova = Retangulo(x1,y1,x1,y1,controlador.cor_linha,controlador.cor_fundo,controlador.espessura_linha)
 
     def arrastar(self,controlador,event):
         if controlador.figura_nova:
@@ -41,7 +41,7 @@ class FerramentaLinha(FerramentaState):
     
     def click(self,controlador,event):
         x1,y1 = event.x,event.y
-        controlador.figura_nova = Linha(x1,y1,x1,y1,controlador.cor_linha)
+        controlador.figura_nova = Linha(x1,y1,x1,y1,controlador.cor_linha,controlador.espessura_linha)
     
     def arrastar(self,controlador,event):
         if controlador.figura_nova:
@@ -57,7 +57,7 @@ class FerramentaPoligono(FerramentaState):
     
     def click(self, controlador, event):
         if not controlador.figura_nova:
-            controlador.figura_nova = Poligono(event.x, event.y, controlador.cor_linha, controlador.cor_fundo)
+            controlador.figura_nova = Poligono(event.x, event.y, controlador.cor_linha, controlador.cor_fundo,controlador.espessura_linha)
         else:
             controlador.figura_nova.adicionar_ponto(event.x,event.y)
             controlador.view.redesenhar(controlador.desenho, controlador.figura_nova)
@@ -79,7 +79,7 @@ class FerramentaPoligono(FerramentaState):
 class FerramentaRabisco(FerramentaState):
     
     def click(self, controlador, event):
-        controlador.figura_nova = Rabisco(event.x, event.y, controlador.cor_linha)
+        controlador.figura_nova = Rabisco(event.x, event.y, controlador.cor_linha,controlador.espessura_linha)
     
     def arrastar(self, controlador, event):
         if controlador.figura_nova:
@@ -93,7 +93,7 @@ class FerramentaRabisco(FerramentaState):
 class FerramentaCirculo(FerramentaState):
     
     def click(self, controlador, event):
-        controlador.figura_nova = Circulo(event.x, event.y, event.x, event.y, controlador.cor_linha, controlador.cor_fundo)
+        controlador.figura_nova = Circulo(event.x, event.y, event.x, event.y, controlador.cor_linha, controlador.cor_fundo,controlador.espessura_linha)
         
     def arrastar(self, controlador, event):
         if controlador.figura_nova:
@@ -107,7 +107,7 @@ class FerramentaCirculo(FerramentaState):
 class FerramentaOval(FerramentaState):
     def click(self, controlador, event):
         x1, y1 = event.x, event.y
-        controlador.figura_nova = Oval(x1, y1, x1, y1, controlador.cor_linha, controlador.cor_fundo)
+        controlador.figura_nova = Oval(x1, y1, x1, y1, controlador.cor_linha, controlador.cor_fundo,controlador.espessura_linha)
 
     def arrastar(self, controlador, event):
         if controlador.figura_nova:

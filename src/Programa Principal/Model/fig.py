@@ -2,10 +2,12 @@ from abc import ABC, abstractmethod
 from tkinter import *
 
 class Figuras(ABC):
-    def __init__(self,corLinha,corFundo = None):
+    def __init__(self,corLinha,corFundo= None, tamanho=1.0):
         self.corLinha = corLinha
         self.corFundo = corFundo
         self.selecionada = False
+        self.tamanho = tamanho
+
     def atualizar(self,x, y):
         pass
         
@@ -19,21 +21,21 @@ class Figuras(ABC):
 
         if self.selecionada:
             return {
-                "dash": (5, 3),
-                "width": 2
+                "dash": (5, 2),
+                "width": self.tamanho
             }
 
         return {
-            "width": 1 #substituir por atributo borda depois
+            "width": self.tamanho #substituir por atributo borda depois
         }
     
 #Pode criar Subclasse que separa as figuras do rabisco,evitando de escrever "atualizar" em todas outras figuras
 class Linha(Figuras):
-    def __init__(self,x1,y1,x2,y2,corLinha):
-        super().__init__(corLinha)
+    def __init__(self,x1,y1,x2,y2,corLinha,tamanho):
+        super().__init__(corLinha,None,tamanho)
         self.x1, self.y1 = x1, y1
         self.x2, self.y2 = x2, y2
-    
+
     def atualizar(self,x, y):
         self.x2 = x
         self.y2 = y
@@ -45,11 +47,11 @@ class Linha(Figuras):
         return distancia(self.x1,self.x2,self.y1,self.y2, x, y) <= 5
 
 class Retangulo(Figuras):
-    def __init__(self,x1,y1,x2,y2,corLinha,corFundo):
-        super().__init__(corLinha,corFundo)
+    def __init__(self,x1,y1,x2,y2,corLinha,corFundo,tamanho):
+        super().__init__(corLinha,corFundo,tamanho)
         self.x1,self.y1 = x1,y1
         self.x2,self.y2 = x2,y2
-        
+
     def atualizar(self,x, y):
         self.x2 = x
         self.y2 = y
@@ -62,11 +64,11 @@ class Retangulo(Figuras):
             (min(self.y1, self.y2) <= y <= max(self.y1, self.y2))
 
 class Oval(Figuras):
-    def __init__(self,x1, y1, x2, y2,corLinha,corFundo):
-        super().__init__(corLinha,corFundo)
+    def __init__(self,x1, y1, x2, y2,corLinha,corFundo,tamanho):
+        super().__init__(corLinha,corFundo,tamanho)
         self.x1,self.y1 = x1,y1
         self.x2, self.y2 = x2, y2
-    
+
     def atualizar(self,x, y):
         self.x2 = x
         self.y2 = y
@@ -89,11 +91,11 @@ class Oval(Figuras):
         return ((x - cx) ** 2) / (a ** 2) + ((y - cy) ** 2) / (b ** 2) <= 1
         #A equação da Elipse é (x - c1)**2/a**2 + (y - c2)**2/b** = 1
 class Circulo(Figuras):
-    def __init__(self,x1, y1,x2,y2,corLinha, corFundo):
-        super().__init__(corLinha, corFundo)
+    def __init__(self,x1, y1,x2,y2,corLinha, corFundo,tamanho):
+        super().__init__(corLinha, corFundo,tamanho)
         self.x1,self.y1 = x1,y1
         self.x2, self.y2 = x2,y2
-    
+
     def atualizar(self,x, y):
         self.x2 = x
         self.y2 = y
@@ -106,10 +108,11 @@ class Circulo(Figuras):
         return  ((x - self.x1) **2 + (y - self.y1)**2)**0.5 <= self.raio
 
 class Rabisco(Figuras):
-    def __init__(self,x,y,corLinha):
-        super().__init__(corLinha)
+    def __init__(self,x,y,corLinha,tamanho):
+        super().__init__(corLinha,None,tamanho)
         self.pontos = [(x,y)]
-        
+        self.tamanho = tamanho
+
     def atualizar(self,x, y):
         self.pontos.append((x,y))
         
@@ -129,11 +132,11 @@ class Rabisco(Figuras):
             
 
 class Poligono(Figuras):
-    def __init__(self,x,y,corLinha,corFundo):
-        super().__init__(corLinha, corFundo)
+    def __init__(self,x,y,corLinha,corFundo,tamanho):
+        super().__init__(corLinha, corFundo,tamanho)
         self.pontos = [(x, y), (x,y)] # 1 ponto fixo e outro ponto temporario
         self.finalizado = False
-    
+        
     def atualizar(self,x,y):
         if not self.finalizado:
             self.pontos[-1] = (x,y)
