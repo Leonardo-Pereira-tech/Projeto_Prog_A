@@ -40,7 +40,11 @@ class Controlador():
         canvas.bind("<ButtonRelease-1>", self.soltarMouse)
         canvas.bind("<ButtonPress-3>", self.botaoDireitoMouse)
         canvas.bind("<BackSpace>",self.apagarDesenho)
-        canvas.bind("<Delete>",self.apagarDesenho)       
+        canvas.bind("<Delete>",self.apagarDesenho)
+        canvas.bind("<Right>", self.moverFrente)
+        canvas.bind("<Left>", self.moverTras)
+        canvas.bind("<Up>", self.moverTopo)
+        canvas.bind("<Down>", self.moverFundo)       
         
         botaoBorda.configure(command=self.escolher_Cor_borda)
         botaoPreencher.configure(command=self.escolher_Cor_preenchimento)
@@ -69,7 +73,11 @@ class Controlador():
     def escolher_Cor_borda(self): 
         cor = colorchooser.askcolor(title="Selecionar Cor")
         if cor and cor[1]:
-            self.cor_linha = cor[1]
+            if self.figura_selecionada:
+                self.figura_selecionada.corLinha = cor[1]
+                self.view.redesenhar(self.desenho,None)
+            else:
+                self.cor_linha = cor[1]
     
     def tamanhoBorda(self,valor):
         self.espessura_linha = float(valor)
@@ -77,7 +85,11 @@ class Controlador():
     def escolher_Cor_preenchimento(self): 
         cor = colorchooser.askcolor(title="Selecionar Cor para preencher")
         if cor and cor[1]:
-            self.cor_fundo = cor[1]
+            if self.figura_selecionada:
+                self.figura_selecionada.corFundo = cor[1]
+                self.view.redesenhar(self.desenho,None)
+            else:
+                self.cor_fundo = cor[1]
             
     def deletar(self):
         
@@ -142,4 +154,24 @@ class Controlador():
             self.desenho.figuras.remove(self.figura_selecionada)
             self.figura_selecionada = None
 
+            self.view.redesenhar(self.desenho,None)
+
+    def moverFrente(self, event=None):
+        if self.figura_selecionada:
+            self.desenho.mover_frente(self.figura_selecionada)
+            self.view.redesenhar(self.desenho,None)
+
+    def moverTras(self, event=None):
+        if self.figura_selecionada:
+            self.desenho.mover_atras(self.figura_selecionada)
+            self.view.redesenhar(self.desenho,None)
+
+    def moverTopo(self, event=None):
+        if self.figura_selecionada:
+            self.desenho.mover_topo(self.figura_selecionada)
+            self.view.redesenhar(self.desenho,None)
+
+    def moverFundo(self, event=None):
+        if self.figura_selecionada:
+            self.desenho.mover_fundo(self.figura_selecionada)
             self.view.redesenhar(self.desenho,None)
