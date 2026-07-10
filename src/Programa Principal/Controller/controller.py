@@ -24,6 +24,7 @@ class Controlador():
         self.ferramenta = FerramentaRetangulo()
         
         self.figura_selecionada = None
+        self.figura_copiada = None
         
         canvas = self.view.canvas
         botaoBorda = self.view.coresBorda
@@ -44,7 +45,9 @@ class Controlador():
         canvas.bind("<Right>", self.moverFrente)
         canvas.bind("<Left>", self.moverTras)
         canvas.bind("<Up>", self.moverTopo)
-        canvas.bind("<Down>", self.moverFundo)       
+        canvas.bind("<Down>", self.moverFundo)      
+        canvas.bind("<Control-c>",self.copiar)
+        canvas.bind("<Control-v>",self.colar)
         
         botaoBorda.configure(command=self.escolher_Cor_borda)
         botaoPreencher.configure(command=self.escolher_Cor_preenchimento)
@@ -175,3 +178,14 @@ class Controlador():
         if self.figura_selecionada:
             self.desenho.mover_fundo(self.figura_selecionada)
             self.view.redesenhar(self.desenho,None)
+    
+    def copiar(self, event = None):
+        if self.figura_selecionada:
+            self.figura_copiada = self.figura_selecionada.copiar()
+    
+    def colar(self, event = None):
+        if self.figura_copiada:
+            nova = self.figura_copiada.copiar()
+            nova.mover(20,20)
+            self.desenho.adicionar_figura(nova)
+            self.view.redesenhar(self.desenho, None)
