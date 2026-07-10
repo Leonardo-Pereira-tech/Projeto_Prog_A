@@ -153,39 +153,30 @@ class Controlador():
                 pickle.dump(self.desenho.figuras, arquivo)
     
     def apagarDesenho(self, event=None):
-        if self.figura_selecionada:
-            self.desenho.figuras.remove(self.figura_selecionada)
-            self.figura_selecionada = None
-
-            self.view.redesenhar(self.desenho,None)
+        self.figura_selecionada = self.desenho.apagar_desenho(self.figura_selecionada)
+        self.view.redesenhar(self.desenho,None)
 
     def moverFrente(self, event=None):
-        if self.figura_selecionada:
-            self.desenho.mover_frente(self.figura_selecionada)
-            self.view.redesenhar(self.desenho,None)
-
+        self.desenho.mover_frente(self.figura_selecionada)
+        self.view.redesenhar(self.desenho,None)
+        
     def moverTras(self, event=None):
-        if self.figura_selecionada:
-            self.desenho.mover_atras(self.figura_selecionada)
-            self.view.redesenhar(self.desenho,None)
-
+        self.desenho.mover_atras(self.figura_selecionada)
+        self.view.redesenhar(self.desenho,None)
+        
     def moverTopo(self, event=None):
-        if self.figura_selecionada:
-            self.desenho.mover_topo(self.figura_selecionada)
-            self.view.redesenhar(self.desenho,None)
-
+        self.desenho.mover_topo(self.figura_selecionada)
+        self.view.redesenhar(self.desenho,None)
+        
     def moverFundo(self, event=None):
-        if self.figura_selecionada:
-            self.desenho.mover_fundo(self.figura_selecionada)
-            self.view.redesenhar(self.desenho,None)
-    
+        self.desenho.mover_fundo(self.figura_selecionada)
+        self.view.redesenhar(self.desenho,None)
+        
     def copiar(self, event = None):
-        if self.figura_selecionada:
-            self.figura_copiada = self.figura_selecionada.copiar()
-    
+        self.figura_copiada = self.desenho.copiar(self.figura_selecionada)
+        self.view.redesenhar(self.desenho,None)
+        
     def colar(self, event = None):
-        if self.figura_copiada:
-            nova = self.figura_copiada.copiar()
-            nova.mover(20,20)
-            self.desenho.adicionar_figura(nova)
-            self.view.redesenhar(self.desenho, None)
+        self.desenho.colar(self.figura_copiada)
+        self.view.redesenhar(self.desenho,None)
+        
