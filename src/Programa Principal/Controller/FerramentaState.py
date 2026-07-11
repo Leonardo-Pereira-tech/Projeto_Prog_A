@@ -121,30 +121,78 @@ class FerramentaOval(FerramentaState):
             
 class FerramentaSelecionar(FerramentaState):
     def click(self, controlador, event):
-        if controlador.figura_selecionada:
-            controlador.figura_selecionada.selecionada = False
-            
-        controlador.figura_selecionada = controlador.desenho.selecionar_figura(event.x,event.y)
+        clickShift = bool(event.state & 0x0001) #detecta se o shift foi pressionado
+        figuraSelecionada = controlador.desenho.selecionar_figura(event.x,event.y) #Descobre qual figura foi selecionada
+        if not clickShift:
+            if figuraSelecionada is None or figuraSelecionada not in controlador.figuras_selecionadas: # para não resetar o quadrado e mover apenas uma figura
+                for figura in controlador.figuras_selecionadas:
+                    figura.selecionada = False 
+                controlador.figuras_selecionadas = []
 
-        if controlador.figura_selecionada:
-            controlador.figura_selecionada.selecionada = True
+        if figuraSelecionada:
+            if clickShift and figuraSelecionada in controlador.figuras_selecionadas: #Saber que so irá alterar as figuras selecionadas
+                figuraSelecionada.selecionada = False
+                controlador.figuras_selecionadas.remove(figuraSelecionada)
+            
+            else:
+                figuraSelecionada.selecionada = True
+                if figuraSelecionada not in controlador.figuras_selecionadas: #Saber se está implementando mais figuras além das que ja foram selecionadas
+                    controlador.figuras_selecionadas.append(figuraSelecionada)
+                
             controlador.clickX = event.x
             controlador.clickY = event.y
+            controlador.caixa_selecao = False # Caso clicou em uma figura não aciona a caixa
             controlador.view.canvas.focus_set()
+
+        else:
+            controlador.clickX = event.x
+            controlador.clickY = event.y
+            controlador.caixa_selecao = True # clicou na figura, aciona a caixa
 
         controlador.view.redesenhar(controlador.desenho, None)
 
     def arrastar(self, controlador, event):
-        if controlador.figura_selecionada and (controlador.clickX != None and controlador.clickY != None): # Sistema não dar erro quando parar de selecionar
-            deltaX = event.x - controlador.clickX # atualizar em tempo real e garantir que não vai deformar a figura
-            deltaY = event.y - controlador.clickY
-            
-            controlador.figura_selecionada.mover(deltaX,deltaY) # Definição no model para mexer
-            controlador.clickX = event.x
-            controlador.clickY = event.y
+        if not controlador.caixa_selecao:
+            if controlador.clickX != None and controlador.clickY != None: # Sistema não dar erro quando parar de selecionar
+                deltaX = event.x - controlador.clickX # atualizar em tempo real e garantir que não vai deformar a figura
+                deltaY = event.y - controlador.clickY
 
-            controlador.view.redesenhar(controlador.desenho,None) #Atualizar o canvas com a mudança
-            
+                for figuras in controlador.figuras_selecionadas:
+                    if figuras:
+                        figuras.mover(deltaX,deltaY) # Definição no model para mexer
+
+                controlador.clickX = event.x
+                controlador.clickY = event.y
+            controlador.view.redesenhar(controlador.desenho,None) # Não fazer a figura dar um teleporte, e sim atualizar o movimento flúido
+        else:
+            controlador.view.redesenhar(controlador.desenho,None) # Não lembro para o que servia, apagando ele funciona, mas antes sem isso o retângulo não aparecia
+       
+            if controlador.retangulo_selecao is not None:
+                controlador.view.canvas.delete(controlador.retangulo_selecao) # Apaga o retangulo antigo, quando já fora criado
+    
+            controlador.retangulo_selecao = controlador.view.canvas.create_rectangle(controlador.clickX,controlador.clickY,event.x,event.y,dash=(4,4),outline='blue',fill="") # criador visual do retângulo
+             
     def soltar(self, controlador, event):
+        if controlador.caixa_selecao:
+            x_min = min(controlador.clickX, event.x) # Esses métodos são para identificar as bordas e posteriormente saber se as figuras estão dentro 
+            x_max = max(controlador.clickX, event.x)
+            y_min = min(controlador.clickY, event.y)
+            y_max = max(controlador.clickY, event.y)
+
+            for figura in controlador.desenho.obter_figuras():
+                figX, figY = figura.obter_pontos() # Método novo do fig para capturar os pontos das figuras(Rabisco e polígono tive que colocar como se fosse matriz)
+                if x_min <= figX <= x_max and y_min <= figY <= y_max: # compara as tuplas e vê se estão dentro do quadrado <---- Bem aqui o comentario do max e min
+                    figura.selecionada = True
+
+                    if figura not in controlador.figuras_selecionadas:
+                        controlador.figuras_selecionadas.append(figura)
+
+            if controlador.retangulo_selecao is not None:
+                controlador.view.canvas.delete(controlador.retangulo_selecao)
+                controlador.retangulo_selecao = None
+            
         controlador.clickX = None # Reset no valor quando parar de soltar (E fazer com que pare de seguir o mouse)
-        controlador.clickY = None 
+        controlador.clickY = None
+        controlador.caixa_selecao = False
+        controlador.view.canvas.focus_set()
+        controlador.view.redesenhar(controlador.desenho,None) # Mostra as figuras selecionadas

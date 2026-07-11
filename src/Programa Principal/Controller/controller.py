@@ -23,8 +23,13 @@ class Controlador():
         
         self.ferramenta = FerramentaRetangulo()
         
-        self.figura_selecionada = None
-        self.figura_copiada = None
+        self.figurasCopiadas = [] # lista exclusiva para copiar e colar
+        self.figuras_selecionadas = [] # Figura agora virou uma lista para fazer a implementação correta de múltipla
+        self.caixa_selecao = False # Variável criada como uma "flag" uma permissão a criação do retângulo
+        self.retangulo_selecao = None #variável criada somente para virar um retângulo
+
+        self.clickX = None # Criei isso aqui porque tava pedindo como parâmetro para as cooords
+        self.clickY = None
         
         canvas = self.view.canvas
         botaoBorda = self.view.coresBorda
@@ -76,8 +81,9 @@ class Controlador():
     def escolher_Cor_borda(self): 
         cor = colorchooser.askcolor(title="Selecionar Cor")
         if cor and cor[1]:
-            if self.figura_selecionada:
-                self.figura_selecionada.corLinha = cor[1]
+            if self.figuras_selecionadas:
+                for figura in self.figuras_selecionadas:
+                    figura.corLinha = cor[1]
                 self.view.redesenhar(self.desenho,None)
             else:
                 self.cor_linha = cor[1]
@@ -88,8 +94,9 @@ class Controlador():
     def escolher_Cor_preenchimento(self): 
         cor = colorchooser.askcolor(title="Selecionar Cor para preencher")
         if cor and cor[1]:
-            if self.figura_selecionada:
-                self.figura_selecionada.corFundo = cor[1]
+            if self.figuras_selecionadas:
+                for figura in self.figuras_selecionadas:
+                    figura.corFundo = cor[1]
                 self.view.redesenhar(self.desenho,None)
             else:
                 self.cor_fundo = cor[1]
@@ -153,30 +160,64 @@ class Controlador():
                 pickle.dump(self.desenho.figuras, arquivo)
     
     def apagarDesenho(self, event=None):
-        self.figura_selecionada = self.desenho.apagar_desenho(self.figura_selecionada)
+        for figura in self.figuras_selecionadas:
+            self.desenho.apagar_desenho(figura)
+            self.figuras_selecionadas = []
         self.view.redesenhar(self.desenho,None)
 
+
+#Todas as funções abaixo foram adaptadas para implementação de lista
+
+
     def moverFrente(self, event=None):
-        self.desenho.mover_frente(self.figura_selecionada)
+        self.figuras_selecionadas.sort(key=lambda f: self.desenho.figuras.index(f),reverse=True) # Esse lambda foi quase um ctrl c + v, mas ele ordena de acordo com a figura que foi desenhada primeiro. Vale testar todas porque so testei algumas funções
+        for figura in self.figuras_selecionadas:
+            self.desenho.mover_frente(figura)
         self.view.redesenhar(self.desenho,None)
         
     def moverTras(self, event=None):
-        self.desenho.mover_atras(self.figura_selecionada)
+        self.figuras_selecionadas.sort(key=lambda f: self.desenho.figuras.index(f)) # De maneira abstrata, moverFrente ou moverTras é tipo um sentido horário e anti-horário, enquanto 
+        for figura in self.figuras_selecionadas:                                    # um vai para um lado, o outro segue o caminho oposto
+            self.desenho.mover_atras(figura)
         self.view.redesenhar(self.desenho,None)
-        
+
     def moverTopo(self, event=None):
-        self.desenho.mover_topo(self.figura_selecionada)
+        self.figuras_selecionadas.sort(key=lambda f: self.desenho.figuras.index(f),reverse=True)
+        for figura in self.figuras_selecionadas:
+            self.desenho.mover_topo(figura)
         self.view.redesenhar(self.desenho,None)
         
     def moverFundo(self, event=None):
-        self.desenho.mover_fundo(self.figura_selecionada)
+        self.figuras_selecionadas.sort(key=lambda f: self.desenho.figuras.index(f))
+        for figura in self.figuras_selecionadas:
+            self.desenho.mover_fundo(figura)
         self.view.redesenhar(self.desenho,None)
-        
-    def copiar(self, event = None):
-        self.figura_copiada = self.desenho.copiar(self.figura_selecionada)
+
+
+    def copiar(self,event=None): # Fiz mudanças até q grandes aqui
+       self.figurasCopiadas = [] # Depois de copiar, caso copie de novo a lista volta a ficar vazia, para não salvar coisas passadas
+       for figura in self.figuras_selecionadas:
+           copia = figura.Copiar() #Crio uma nova variável para adicionar na lista das cópias
+            #copia.selecionada = False    #Talvez precise, caso dê algum bug
+           self.figurasCopiadas.append(copia)
+
+    def colar(self,event=None):
+        if not self.figurasCopiadas:
+            return
+
+        for figura in self.figuras_selecionadas:
+            figura.selecionada = False
+        self.figuras_selecionadas = []
+
+        deslocamento = 20 #Para a copia não sobrepor, mais por design mesmo
+
+        for figuraCopiada in self.figurasCopiadas:
+            novaFigura = figuraCopiada.Copiar()
+            
+            novaFigura.mover(deslocamento,deslocamento)
+            novaFigura.selecionada = True
+            
+            self.desenho.adicionar_figura(novaFigura)
+            self.figuras_selecionadas.append(novaFigura)
+ 
         self.view.redesenhar(self.desenho,None)
-        
-    def colar(self, event = None):
-        self.desenho.colar(self.figura_copiada)
-        self.view.redesenhar(self.desenho,None)
-        

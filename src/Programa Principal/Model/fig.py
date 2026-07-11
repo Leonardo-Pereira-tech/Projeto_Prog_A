@@ -37,7 +37,11 @@ class Figuras(ABC):
             "width": self.tamanho #substituir por atributo borda depois
         }
     @abstractmethod
-    def copiar(self):
+    def Copiar(self):
+        pass
+    
+    @abstractmethod
+    def obter_pontos(self):
         pass
 
 #Pode criar Subclasse que separa as figuras do rabisco,evitando de escrever "atualizar" em todas outras figuras
@@ -49,7 +53,7 @@ class Linha(Figuras):
 
     def atualizar(self,x, y):
         self.x2 = x
-        self.y2 = y
+        self.y2 = y 
 
     def desenhar(self,canvas):
         canvas.create_line(self.x1,self.y1,self.x2,self.y2,fill=self.corLinha,**self.estilo())#O ** pega o dicionario do metodo estilo e transforma em argumentos
@@ -57,8 +61,11 @@ class Linha(Figuras):
     def contem(self,x, y):
         return distancia(self.x1,self.x2,self.y1,self.y2, x, y) <= 5
     
-    def copiar(self):
+    def Copiar(self):
         return Linha(self.x1,self.y1,self.x2,self.y2,self.corLinha,self.tamanho)
+
+    def obter_pontos(self):
+        return self.x1, self.y1
 
 class Retangulo(Figuras):
     def __init__(self,x1,y1,x2,y2,corLinha,corFundo,tamanho):
@@ -77,8 +84,11 @@ class Retangulo(Figuras):
         return (min(self.x1, self.x2) <= x <= max(self.x1, self.x2)) and \
             (min(self.y1, self.y2) <= y <= max(self.y1, self.y2))
             
-    def copiar(self):
+    def Copiar(self):
         return Retangulo(self.x1,self.y1,self.x2, self.y2,self.corFundo,self.corLinha,self.tamanho )
+
+    def obter_pontos(self):
+        return self.x1,self.y1
 
 class Oval(Figuras):
     def __init__(self,x1, y1, x2, y2,corLinha,corFundo,tamanho):
@@ -107,8 +117,11 @@ class Oval(Figuras):
         
         return ((x - cx) ** 2) / (a ** 2) + ((y - cy) ** 2) / (b ** 2) <= 1
         #A equação da Elipse é (x - c1)**2/a**2 + (y - c2)**2/b** = 1
-    def copiar(self):
+    def Copiar(self):
         return Oval(self.x1,self.y1,self.x2, self.y2,self.corFundo, self.corLinha,self.tamanho )
+
+    def obter_pontos(self):
+        return self.x1,self.y1
 
 class Circulo(Figuras):
     def __init__(self,x1, y1,x2,y2,corLinha, corFundo,tamanho):
@@ -127,10 +140,13 @@ class Circulo(Figuras):
     def contem(self,x, y):
         return  ((x - self.x1) **2 + (y - self.y1)**2)**0.5 <= self.raio
 
-    def copiar(self):
+    def Copiar(self):
         return Circulo(self.x1,self.y1, self.x2, self.y2,
                                 self.corFundo, self.corLinha,self.tamanho )
 
+    def obter_pontos(self):
+        return self.x1,self.y1
+    
 class Rabisco(Figuras):
     def __init__(self,x,y,corLinha,tamanho):
         super().__init__(corLinha,None,tamanho)
@@ -158,13 +174,15 @@ class Rabisco(Figuras):
     def mover(self,dx,dy):
         self.pontos = [(dx+x , dy+y) for x,y in self.pontos] # Compreensão de listas para atualizar simultaneamente o x e o y
     
-    def copiar(self):
+    def Copiar(self):
         novo = Rabisco(self.pontos[0][0],
                        self.pontos[0][1],
                        self.corLinha,self.tamanho)
         novo.pontos = self.pontos
         return novo
-        
+
+    def obter_pontos(self):
+        return self.pontos[0][0],self.pontos[0][1]
 
 class Poligono(Figuras):
     def __init__(self,x,y,corLinha,corFundo,tamanho):
@@ -233,7 +251,7 @@ class Poligono(Figuras):
     def mover(self,dx,dy):
         self.pontos = [(dx+x , dy+y) for x , y in self.pontos] # Compreensão de listas para atualizar simultaneamente o x e o y
         
-    def copiar(self):
+    def Copiar(self):
         novo = Poligono(self.pontos[0][0],
                         self.pontos[0][1],
                         self.corLinha,
@@ -241,6 +259,9 @@ class Poligono(Figuras):
         novo.pontos = self.pontos
         novo.finalizado = self.finalizado
         return novo
+    
+    def obter_pontos(self):
+        return self.pontos[0][0],self.pontos[0][1]
 
 def distancia(x1, x2, y1, y2, px, py) :
     # Vetor direção do segmento (AB)

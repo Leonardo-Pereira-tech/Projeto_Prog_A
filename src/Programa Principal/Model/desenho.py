@@ -54,7 +54,7 @@ class Desenho():
             self.figuras.insert(0, figura)
             
     
-    def copiar(self, figura):
+    def Copiar(self, figura):
         if figura:
             return figura.copiar()
         
@@ -63,7 +63,8 @@ class Desenho():
             nova = figura.copiar()
             nova.mover(20,20)
             self.adicionar_figura(nova)
-    
+            return nova
+
     def apagar_desenho(self,figura):
         if figura:
             self.figuras.remove(figura)
