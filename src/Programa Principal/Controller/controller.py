@@ -123,6 +123,8 @@ class Controlador():
             self.ferramenta = FerramentaCirculo()
         elif nome == "Selecionar":
             self.ferramenta = FerramentaSelecionar()
+        elif nome == "PolígonoRegular":
+            self.ferramenta = FerramentaPoligonoRegular()
 
     def printar_imagem(self):
         caminho_arquivo = filedialog.asksaveasfilename(

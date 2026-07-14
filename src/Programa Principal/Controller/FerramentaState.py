@@ -70,10 +70,11 @@ class FerramentaPoligono(FerramentaState):
         pass
     
     def botaoDireito(self, controlador, event):
-        controlador.figura_nova.finalizar()
-        controlador.desenho.adicionar_figura(controlador.figura_nova)
-        controlador.view.redesenhar(controlador.desenho, controlador.figura_nova)
-        controlador.figura_nova = None
+        if controlador.figura_nova:
+            controlador.figura_nova.finalizar()
+            controlador.desenho.adicionar_figura(controlador.figura_nova)
+            controlador.view.redesenhar(controlador.desenho, controlador.figura_nova)
+            controlador.figura_nova = None
 
 class FerramentaRabisco(FerramentaState):
     
@@ -118,10 +119,31 @@ class FerramentaOval(FerramentaState):
         if controlador.figura_nova:
             controlador.desenho.adicionar_figura(controlador.figura_nova)
             controlador.figura_nova = None
+class FerramentaPoligonoRegular(FerramentaState):
+    def click(self, controlador, event):
+        if not controlador.figura_nova:
+            controlador.figura_nova = PoligonosRegulares(event.x,event.y, controlador.cor_linha,controlador.cor_fundo,controlador.espessura_linha)
+        else:
+            controlador.figura_nova.adicionar_lado()
+            controlador.view.redesenhar(controlador.desenho, controlador.figura_nova)
+    def arrastar(self, controlador, event):
+        if controlador.figura_nova:
+            controlador.figura_nova.atualizar(event.x,event.y)
+            controlador.view.redesenhar(controlador.desenho, controlador.figura_nova)
+    def soltar(self,controlador, event):
+        pass
+    def botaoDireito(self,controlador, event):
+        if controlador.figura_nova:
+            controlador.figura_nova.finalizar()
+            controlador.desenho.adicionar_figura(controlador.figura_nova)
+            controlador.view.redesenhar(controlador.desenho, controlador.figura_nova)
+            controlador.figura_nova = None
+    
+    
             
 class FerramentaSelecionar(FerramentaState):
     def click(self, controlador, event):
-        clickShift = bool(event.state & 0x0001) #detecta se o shift foi pressionado
+        clickShift = bool(event.state & 0x0004) #detecta se o shift foi pressionado
         figuraSelecionada = controlador.desenho.selecionar_figura(event.x,event.y) #Descobre qual figura foi selecionada
         if not clickShift:
             if figuraSelecionada is None or figuraSelecionada not in controlador.figuras_selecionadas: # para não resetar o quadrado e mover apenas uma figura

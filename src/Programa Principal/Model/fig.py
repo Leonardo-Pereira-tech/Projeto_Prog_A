@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from tkinter import *
+import math
 
 class Figuras(ABC):
     def __init__(self,corLinha,corFundo= None, tamanho=1.0):
@@ -262,7 +263,89 @@ class Poligono(Figuras):
     
     def obter_pontos(self):
         return self.pontos[0][0],self.pontos[0][1]
+    
+class PoligonosRegulares(Figuras):
+    def __init__(self,x,y,corLinha,corFundo,tamanho):
+        super().__init__(corLinha, corFundo,tamanho)
+        self.cx, self.cy = x, y
+        self.lados = 3
+        
+        self.finalizado = False
+        
+    def atualizar(self, x, y):
+        if not self.finalizado:
+            self.x, self.y = x, y
+            self.raio = ((self.x - self.cx) **2 + (self.y - self.cy)**2)**0.5
+            
+    def adicionar_lado(self):
+        if not self.finalizado:
+            self.lados += 1
+            
+    def finalizar(self):
+        self.finalizado = True
+        
+    def desenhar(self, canvas):
+        angulo_passo = (2 * math.pi)/self.lados
+        if self.lados % 2 == 0:
+            offset = angulo_passo/2
+        else:
+            offset = 0
+        self.pontos = []
+        for i in range(self.lados):
+            angulo = i * angulo_passo + offset - math.pi / 2
+            x = self.cx + (self.raio * math.cos(angulo))
+            y = self.cy + (self.raio * math.sin(angulo))
+            self.pontos.append((x,y))
+        canvas.create_polygon(self.pontos, fill=self.corFundo, outline=self.corLinha,**self.estilo())
+    def finalizar(self):
+        self.finalizado = True
+    def contem(self, x, y):
+        dentro = False
+        n = len(self.pontos)
 
+        # Se o polígono não tiver pelo menos 3 vértices, não é um polígono válido
+        if n < 3:
+            return False
+
+        # Inicializa o último vértice do polígono como ponto de partida
+        p1x, p1y = self.pontos[0]
+
+        for i in range(n + 1):
+            # Avança para o próximo vértice
+            p2x, p2y = self.pontos[i % n]
+
+            # Verifica se o raio horizontal intercepta a aresta do polígono
+            if y > min(p1y, p2y):
+                if y <= max(p1y, p2y):
+                    if x <= max(p1x, p2x):
+                        # Calcula a interceptação X exata da aresta
+                        if p1y != p2y:
+                            x_interceptado = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+                        # Se o ponto estiver à esquerda da interceptação, inverte o estado
+                        if p1x == p2x or x <= x_interceptado:
+                            dentro = not dentro
+
+            p1x, p1y = p2x, p2y
+
+        return dentro
+    
+    def mover(self,dx,dy):
+        self.cx += dx
+        self.cy += dy
+    
+    def Copiar(self):
+        novo = PoligonosRegulares(self.cx, self.cy,
+                                  self.corLinha,
+                                  self.corFundo,
+                                  self.tamanho)
+        novo.pontos = self.pontos
+        novo.finalizado = self.finalizado 
+        novo.raio = self.raio
+        novo.lados = self.lados
+        return novo
+    def obter_pontos(self):
+        return self.cx, self.cy
+        
 def distancia(x1, x2, y1, y2, px, py) :
     # Vetor direção do segmento (AB)
     dx = x2 - x1
