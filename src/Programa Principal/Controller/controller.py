@@ -38,6 +38,7 @@ class Controlador():
         botaoPrintar = self.view.printar
         botaoAbrir = self.view.abrir
         botaoSalvarProjeto = self.view.salvar
+        botaoAgrupar = self.view.agrupar
         escalaBorda = self.view.escala
         
         canvas.bind("<ButtonPress-1>", self.clickMouse)
@@ -53,6 +54,8 @@ class Controlador():
         canvas.bind("<Down>", self.moverFundo)      
         canvas.bind("<Control-c>",self.copiar)
         canvas.bind("<Control-v>",self.colar)
+        canvas.bind("<Control-g>",self.agrupar)
+        canvas.bind("<Control-Shift-G>",self.desagrupar)
         
         botaoBorda.configure(command=self.escolher_Cor_borda)
         botaoPreencher.configure(command=self.escolher_Cor_preenchimento)
@@ -60,6 +63,7 @@ class Controlador():
         botaoPrintar.configure(command=self.printar_imagem)
         botaoAbrir.configure(command=self.abrir_imagem)
         botaoSalvarProjeto.configure(command=self.salvar_projeto)
+        botaoAgrupar.configure(command=self.agrupar)
         escalaBorda.configure(command=self.tamanhoBorda)
         
         self.view.menu.bind("<<ComboboxSelected>>", self.mudarFerramenta)
@@ -222,4 +226,45 @@ class Controlador():
             self.desenho.adicionar_figura(novaFigura)
             self.figuras_selecionadas.append(novaFigura)
  
+        self.view.redesenhar(self.desenho,None)
+
+    def agrupar(self, event=None):
+        if len(self.figuras_selecionadas) < 2:
+            return
+        
+        # Ordenada pela ordem real de desenho
+        figuras_ordenadas = sorted(self.figuras_selecionadas,
+                                   key = lambda f: self.desenho.figuras.index(f))
+        
+        # Guarda onde o grupo deve ficar
+        indice = self.desenho.figuras.index(figuras_ordenadas[0])
+
+        # Remove as figuras antigas
+        for figura in figuras_ordenadas:
+            self.desenho.figuras.remove(figura)
+
+        # Cria o grupo mantendo a ordem original
+        grupo = FiguraComposta(figuras_ordenadas)
+
+        grupo.selecionada = True
+
+        # Coloca o grupo no lugar da primeira figura
+        self.desenho.figuras.insert(indice, grupo)
+        self.figuras_selecionadas = [grupo]
+        self.view.redesenhar(self.desenho,None)
+
+    def desagrupar(self,event=None):
+        for figura in self.figuras_selecionadas:
+            if isinstance(figura, FiguraComposta):
+
+                indice = self.desenho.figuras.index(figura)
+                self.desenho.figuras.remove(figura)
+                figuras = figura.desagrupar()
+
+                # Preserva a ordem
+                for i, nova_figura in enumerate(figuras):
+                    nova_figura.selecionada = False
+                    self.desenho.figuras.insert(indice + i, nova_figura)
+
+        self.figuras_selecionadas = []
         self.view.redesenhar(self.desenho,None)

@@ -44,6 +44,9 @@ class Canvasview:
         self.printar = ttk.Button(self.frame,text="Print",command=None)
         self.printar.pack(side=LEFT,padx=10)
 
+        self.agrupar = ttk.Button(self.frame,text="Agrupar",command=None)
+        self.agrupar.pack(side=LEFT,padx=10)
+
         self.escala = ttk.Scale(self.frame,from_=1, to=50,orient=HORIZONTAL,command=None)
         self.escala.pack(side=RIGHT,padx=10)
 

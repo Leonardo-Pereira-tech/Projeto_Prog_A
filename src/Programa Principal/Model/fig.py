@@ -345,6 +345,46 @@ class PoligonosRegulares(Figuras):
         return novo
     def obter_pontos(self):
         return self.cx, self.cy
+    
+class FiguraComposta(Figuras):
+    def __init__(self, figuras):
+        super().__init__(None,None)
+        self.figuras = figuras
+        self.selecionada = False
+
+    def desenhar(self, canvas):
+        for figura in self.figuras:
+            figura.selecionada = self.selecionada
+            figura.desenhar(canvas)
+
+    def contem(self, x, y):
+        for figura in self.figuras:
+            if figura.contem(x, y):
+                return True
+        return False
+    
+    def mover(self, dx, dy):
+        for figura in self.figuras:
+            figura.mover(dx, dy)
+
+    def Copiar(self):
+        copias = []
+        for figura in self.figuras:
+            copias.append(figura.Copiar())
+        return FiguraComposta(copias)
+    
+    def obter_pontos(self):
+        """ Retorna o ponto mais superior/esquerdo da figura composta.
+        Usado pela seleção por caixa"""
+        pontos = []
+        for figura in self.figuras:
+            pontos.append(figura.obter_pontos())
+        menor_x = min(p[0] for p in pontos)
+        menor_y = min(p[1] for p in pontos)
+        return menor_x, menor_y
+    
+    def desagrupar(self):
+        return self.figuras.copy()
         
 def distancia(x1, x2, y1, y2, px, py) :
     # Vetor direção do segmento (AB)
