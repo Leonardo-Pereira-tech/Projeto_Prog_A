@@ -274,8 +274,12 @@ class PoligonosRegulares(Figuras):
         
     def atualizar(self, x, y):
         if not self.finalizado:
-            self.x, self.y = x, y
-            self.raio = ((self.x - self.cx) **2 + (self.y - self.cy)**2)**0.5
+            dx = x - self.cx
+            dy = y - self.cy
+
+            
+            self.raio = ((x - self.cx) **2 + (y - self.cy)**2)**0.5
+            self.angulo_inicial = math.atan2(dy,dx)
             
     def adicionar_lado(self):
         if not self.finalizado:
@@ -286,16 +290,13 @@ class PoligonosRegulares(Figuras):
         
     def desenhar(self, canvas):
         angulo_passo = (2 * math.pi)/self.lados
-        if self.lados % 2 == 0:
-            offset = angulo_passo/2
-        else:
-            offset = 0
+        
         self.pontos = []
         for i in range(self.lados):
-            angulo = i * angulo_passo + offset - math.pi / 2
+            angulo = self.angulo_inicial + i * angulo_passo
             x = self.cx + (self.raio * math.cos(angulo))
             y = self.cy + (self.raio * math.sin(angulo))
-            self.pontos.append((x,y))
+            self.pontos.append([x,y])
         canvas.create_polygon(self.pontos, fill=self.corFundo, outline=self.corLinha,**self.estilo())
     def finalizar(self):
         self.finalizado = True

@@ -57,6 +57,7 @@ class Controlador():
         canvas.bind("<Control-g>",self.agrupar)
         canvas.bind("<Control-Shift-G>",self.desagrupar)
         
+        
         botaoBorda.configure(command=self.escolher_Cor_borda)
         botaoPreencher.configure(command=self.escolher_Cor_preenchimento)
         botaoApagar.configure(command=self.deletar)
@@ -81,6 +82,9 @@ class Controlador():
     #Função para finalizar o polígono
     def botaoDireitoMouse(self, event):
         self.ferramenta.botaoDireito(self, event) 
+
+    def tirar_lados(self, event):
+        self.ferramenta.tirarLados(self,event)
     
     def escolher_Cor_borda(self): 
         cor = colorchooser.askcolor(title="Selecionar Cor")
@@ -176,7 +180,7 @@ class Controlador():
 
 
     def moverFrente(self, event=None):
-        self.figuras_selecionadas.sort(key=lambda f: self.desenho.figuras.index(f),reverse=True) # Esse lambda foi quase um ctrl c + v, mas ele ordena de acordo com a figura que foi desenhada primeiro. Vale testar todas porque so testei algumas funções
+        self.figuras_selecionadas.sort(key=lambda f: self.desenho.figuras.index(f)) # Esse lambda foi quase um ctrl c + v, mas ele ordena de acordo com a figura que foi desenhada primeiro. Vale testar todas porque so testei algumas funções
         for figura in self.figuras_selecionadas:
             self.desenho.mover_frente(figura)
         self.view.redesenhar(self.desenho,None)
@@ -188,7 +192,7 @@ class Controlador():
         self.view.redesenhar(self.desenho,None)
 
     def moverTopo(self, event=None):
-        self.figuras_selecionadas.sort(key=lambda f: self.desenho.figuras.index(f),reverse=True)
+        self.figuras_selecionadas.sort(key=lambda f: self.desenho.figuras.index(f))
         for figura in self.figuras_selecionadas:
             self.desenho.mover_topo(figura)
         self.view.redesenhar(self.desenho,None)

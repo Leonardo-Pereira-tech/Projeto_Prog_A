@@ -19,6 +19,9 @@ class FerramentaState(ABC):
     @abstractmethod
     def soltar(self,controlador,event):
         pass
+    
+    def tirarLados(self, controlador, event):
+        pass
         
 class FerramentaRetangulo(FerramentaState):
     
@@ -35,6 +38,7 @@ class FerramentaRetangulo(FerramentaState):
         if controlador.figura_nova:
             controlador.desenho.adicionar_figura(controlador.figura_nova)
             controlador.figura_nova = None
+    
             
 class FerramentaLinha(FerramentaState):
     
@@ -121,11 +125,16 @@ class FerramentaOval(FerramentaState):
             controlador.figura_nova = None
 class FerramentaPoligonoRegular(FerramentaState):
     def click(self, controlador, event):
+        clickCtrl = bool(event.state & 0x0004) #detecta se o shift foi pressionado
         if not controlador.figura_nova:
             controlador.figura_nova = PoligonosRegulares(event.x,event.y, controlador.cor_linha,controlador.cor_fundo,controlador.espessura_linha)
+        elif(clickCtrl):
+            controlador.figura_nova.lados -= 1
+            controlador.view.redesenhar(controlador.desenho, controlador.figura_nova)
         else:
             controlador.figura_nova.adicionar_lado()
             controlador.view.redesenhar(controlador.desenho, controlador.figura_nova)
+        
     def arrastar(self, controlador, event):
         if controlador.figura_nova:
             controlador.figura_nova.atualizar(event.x,event.y)
@@ -138,21 +147,22 @@ class FerramentaPoligonoRegular(FerramentaState):
             controlador.desenho.adicionar_figura(controlador.figura_nova)
             controlador.view.redesenhar(controlador.desenho, controlador.figura_nova)
             controlador.figura_nova = None
+   
     
     
             
 class FerramentaSelecionar(FerramentaState):
     def click(self, controlador, event):
-        clickShift = bool(event.state & 0x0004) #detecta se o shift foi pressionado
+        clickCtrl = bool(event.state & 0x0004) #detecta se o shift foi pressionado
         figuraSelecionada = controlador.desenho.selecionar_figura(event.x,event.y) #Descobre qual figura foi selecionada
-        if not clickShift:
+        if not clickCtrl:
             if figuraSelecionada is None or figuraSelecionada not in controlador.figuras_selecionadas: # para não resetar o quadrado e mover apenas uma figura
                 for figura in controlador.figuras_selecionadas:
                     figura.selecionada = False 
                 controlador.figuras_selecionadas = []
 
         if figuraSelecionada:
-            if clickShift and figuraSelecionada in controlador.figuras_selecionadas: #Saber que so irá alterar as figuras selecionadas
+            if clickCtrl and figuraSelecionada in controlador.figuras_selecionadas: #Saber que so irá alterar as figuras selecionadas
                 figuraSelecionada.selecionada = False
                 controlador.figuras_selecionadas.remove(figuraSelecionada)
             

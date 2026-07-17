@@ -9,7 +9,7 @@ from Controller.controller import *
 
 
 figuras = Desenho()
-figura_nova = None
+
 
 janela = Tk();janela.title("Entrega1")
 
