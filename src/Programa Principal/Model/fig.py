@@ -284,6 +284,10 @@ class PoligonosRegulares(Figuras):
     def adicionar_lado(self):
         if not self.finalizado:
             self.lados += 1
+    
+    def tirar_lado(self):
+        if not self.finalizado and self.lados >= 4:
+            self.lados -= 1
             
     def finalizar(self):
         self.finalizado = True

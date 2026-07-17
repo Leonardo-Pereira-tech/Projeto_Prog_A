@@ -129,7 +129,7 @@ class FerramentaPoligonoRegular(FerramentaState):
         if not controlador.figura_nova:
             controlador.figura_nova = PoligonosRegulares(event.x,event.y, controlador.cor_linha,controlador.cor_fundo,controlador.espessura_linha)
         elif(clickCtrl):
-            controlador.figura_nova.lados -= 1
+            controlador.figura_nova.tirar_lado()
             controlador.view.redesenhar(controlador.desenho, controlador.figura_nova)
         else:
             controlador.figura_nova.adicionar_lado()
